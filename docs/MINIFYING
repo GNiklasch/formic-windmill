@@ -1,0 +1,32 @@
+To get from Windmill.js to Windmill-golfed.js:
+
+(1) Using your favorite text editor, manually remove all /* ... */
+block comments,
+
+(2) manually remove or comment out the one debugme() call which spans
+multiple lines  (in the function runDefenderStrategies()),
+
+(3) manually remove or comment out the explicit console.log() calls
+conditioned on DEBUG_PATTERN_CHECK_VERBOSELY  (in the pattern engine
+functions near the end of the file)  and the definition of this variable
+(near the beginning),
+
+(4) save the result to an intermediate file,
+
+(5) and run this through the bin/minify-Windmill.pl filter.
+
+This last step will remove all //-comments, one-line debugme() calls,
+and indentation and much other whitespace including many line endings,
+and replace all variable and function identifiers with abbreviations.
+The filter rules will need updating when significant amounts of new
+identifiers are added to the .js source.
+
+Thus the ~140KB source will be condensed into the ~41KB version
+suitable for a PPCG answer.
+
+(The answer size limit on https://codegolf.stackexchange.com/ is 65536
+characters, which is already larger than the general StackExchange default.
+Bear in mind though that code blocks are marked-down by indenting every
+line with 4 spaces, which would add back several KB to the code size if
+the Perl script didn't run together many shortish lines into a much
+smaller number of rather long lines.)
