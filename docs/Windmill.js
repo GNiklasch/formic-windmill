@@ -1165,7 +1165,7 @@ function runQueenOperatingMineStrategy() {
 	    // see directly, but visible from the alert-colored cell.
 	    // Put a miner there.
 	    debugme("Enemy queen beyond our own view reported by the gardener.");
-	    return {cell:CCW[compass+5], type:ANT_JUNIOR_MINER};
+	    return {cell:CCW[compass+7], type:ANT_JUNIOR_MINER};
 	}
     } else if (view[CCW[compass+1]].ant.food > 0) {
 	// A food-bearing enemy queen has appeared next to our secretary,
