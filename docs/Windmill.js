@@ -1,5 +1,5 @@
 /*
- * GNi 2017-09-27
+ * GNi 2017-09-27, 2018-01-13
 
 For background and context, see:
 https://codegolf.stackexchange.com/questions/135102/formic-functions-ant-queen-of-the-hill-contest
@@ -567,9 +567,6 @@ var PAT_MS0RFR = [
 // #future# Patterns (and code) for food found a moment before wrapping around
 // onto the left rail edge
 
-// #future# Patterns to detect when a shaft is about to crash (almost) head-on
-// into a rail:  Watch out for KGR ahead (being MR0, RR0, RM0) -- shaft phase
-// is unpredictable
 */
 
 /*
@@ -1757,6 +1754,38 @@ function runUMDrillingShaftStrategy() {
 	pattern = PAT_MS2;
 	debugme("- trying PAT_MS2");
 	mismatch = patternCheck(pattern, AIM_DOWN, 3, 2);
+    }
+    if (compass >= 0) {
+	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
+	// check for possible wraparound onto the head of the next rail.
+	// We only do this for these first two patterns, so as not to be too
+	// easily confused when we drill into unknown random ground;  at worst
+	// we might already have obliterated a short stretch of rail before we
+	// notice it.
+	if ((mismatch < 0) &&
+	    (view[CCW[compass]].color == LCL_RM0) &&
+	    (view[CCW[compass+1]].color == LCL_RR0) &&
+	    (view[CCW[compass+2]].color == LCL_MR0)) {
+	    debugme("This looks like a rail head, let's see...");
+	    // Step onto the apparent RM0 cell, if possible.  Ideally we should
+	    // then find ourselves on mid-rail with seven correctly colored
+	    // cells, and we'll turn around and extend this rail, repairing
+	    // any damage we had already done.  If we guessed wrong, we'll
+	    // probably do what a confused UM does and erase some colours whilst
+	    // random walking;  if we then happen to wander into our previous
+	    // shaft again, we may be able to continue drilling.
+	    if (destOK[CCW[compass]]) {
+		return {cell:CCW[compass]};
+	    } else if (destOK[CCW[compass+1]]) {
+		// try the apparent RR0 cell instead  (risky - we might not
+		// recognize it as such once we stand on it, even it is!)
+		return {cell:CCW[compass+1]};
+	    } else {
+		debugme("Too crowded to try switching to the rail.");
+		return CELL_NOP;
+	    }
+	}
+	return (runUMDrillingShaftTactic(pattern, mismatch));
     }
     if ((compass < 0) &&
 	(specLateral[LCL_ML1] >= 1) &&
