@@ -2157,8 +2157,17 @@ function runLMReachingHomeStrategy() {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	return (runLMLeaveRLTactic());
     }
-    // If this didn't work, it may be worthwhile actually locating the
-    // friendly staff, and circling her clockwise. #future#
+    // If this didn't work, we do what a UM would do in this case:  locate the
+    // friendly staff and circle here clockwise.
+    for (var i = 0; i < TOTAL_NBRS; i++) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    (view[CCW[i]].ant.type == ANT_STAFF)) {
+	    if (destOK[CCW[i+1]]) {
+		return {cell:CCW[i+1]};
+	    }
+	}
+    }
+    // No cigar... wait for a better opportunity.
     return CELL_NOP;
 }
 
