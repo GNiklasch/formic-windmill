@@ -1657,6 +1657,15 @@ function runUMPreparingShaftStrategy() {
     var mismatch = patternCheck(pattern, AIM_DOWN, 3, 2);
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
+	var c = CCW[compass+1];
+	// Before we start painting anything:  Is there a laden friend trying to
+	// step up out of this shaft?
+	if (view[c].ant && view[c].ant.friend && (view[c].ant.food > 0) &&
+	    destOK[CCW[compass+5]]) {
+	    // retreat to RM1 and let them get on with it first
+	    debugme("UM at RR1: Have met an LM, postponing my drilling");
+	    return {cell:CCW[compass+5]};
+	}
 	if ((view[CCW[compass+2]].color == LCL_MX_M3OUT) &&
 	    (view[CCW[compass]].color == LCL_MR0) &&
 	    (view[CCW[compass+1]].color == LCL_CLEAR) &&
@@ -1697,14 +1706,13 @@ function runUMPreparingShaftStrategy() {
 	    var cc = fwdWrong[0];
 	    return {cell:cc.v, color:fixup(pattern[cc.p])};
 	} else {
-	    var c = CCW[compass+1];
 	    if (destOK[c]) {
 		// The MX cell will be painted "IN" once we're one further
 		// step down into the shaft head.
 		return {cell:c};
 	    } else if (view[c].ant && view[c].ant.friend) {
 		// A fellow miner is already on the MS0 cell  (probably
-		// a laden one, but it doesn't matter).  Step aside and
+		// an unladen one, but it doesn't matter).  Step aside and
 		// let her get on with her mission.
 		debugme("UM at RR1: I shouldn't be drilling here");
 		if (destOK[CCW[compass+5]]) {
@@ -2110,8 +2118,12 @@ function runLMLeavingVacantShaftStrategy() {
 	    // changed by someone else, either upon seeing our MX, or in the
 	    // course of rail repair) -- so just step up to RR1.
 	    return {cell:CCW[compass+5]};
+	} else if (view[CCW[compass+5]].ant && view[CCW[compass+5]].ant.friend &&
+		   destOK[CCW[compass+6]]) {
+	    // try stepping around our friend (who might wish to drill here) to RR0
+	    return {cell:CCW[compass+6]};
 	} else {
-	    return CELL_NOP; // wait for the obstacle to go away
+	    return CELL_NOP; // hope and wait for the obstacles to go away
 	}
     } else if (specLikeCenterShaft()) {
 	debugme("Laden Miner: spectrum also resembles mine shaft");
