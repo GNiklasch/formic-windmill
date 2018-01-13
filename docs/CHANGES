@@ -1,0 +1,10 @@
+v1.1 2018-tbd
+
+Bugfixes:
+0006 Disqualified: new worker on top of another ant
+0005 Shaft/rail wraparound detection
+
+Enhancements:
+0001 LMs can get stuck next to the gardener
+
+v1.0 2017-09-28 initial release
