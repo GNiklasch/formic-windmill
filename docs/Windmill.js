@@ -1,5 +1,5 @@
 /*
- * GNi 2017-09-27, 2018-01-13
+ * GNi 2017-09-27, 2018-01-14
 
 For background and context, see:
 https://codegolf.stackexchange.com/questions/135102/formic-functions-ant-queen-of-the-hill-contest
@@ -1660,11 +1660,15 @@ function runUMPreparingShaftStrategy() {
 	var c = CCW[compass+1];
 	// Before we start painting anything:  Is there a laden friend trying to
 	// step up out of this shaft?
-	if (view[c].ant && view[c].ant.friend && (view[c].ant.food > 0) &&
-	    destOK[CCW[compass+5]]) {
-	    // retreat to RM1 and let them get on with it first
+	if (view[c].ant && view[c].ant.friend && (view[c].ant.food > 0)) {
 	    debugme("UM at RR1: Have met an LM, postponing my drilling");
-	    return {cell:CCW[compass+5]};
+	    if (destOK[CCW[compass+5]]) {
+		// retreat to RM1 if possible and let them get on with it first
+		return {cell:CCW[compass+5]};
+	    } else {
+		// don't interfere with the LM's painting
+		return CELL_NOP;
+	    }
 	}
 	if ((view[CCW[compass+2]].color == LCL_MX_M3OUT) &&
 	    (view[CCW[compass]].color == LCL_MR0) &&
@@ -3165,8 +3169,15 @@ function runLMLeavingShaftTactic(pattern, mismatch) {
     // latter has matched straight away.
     debugme("LMLeavingShaftTactic...");
     if (mismatch < 0) {
-	// #future# review this... can it overpaint MX prematurely?
+	if (view[CCW[compass+5]].ant && view[CCW[compass+5]].ant.friend) {
+	    // Don't dispute a friend over colors of cells closer to her than to us.
+	    // An LM will soon walk away towards the queen;  a UM will see us and
+	    // try to bow out and retreat to RM1.
+	    debugme("LM: Friend on RR1, deferring to her for now");
+	    return CELL_NOP;
+	}
 	// fix any forward discrepancy first (e.g. if IN_USE got lost)
+	// #future# review this... can this overpaint MX prematurely?
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     }
