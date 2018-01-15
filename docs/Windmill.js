@@ -2203,7 +2203,7 @@ function runLMReachingHomeStrategy() {
 	return (runLMLeaveRLTactic());
     }
     // If this didn't work, we do what a UM would do in this case:  locate the
-    // friendly staff and circle here clockwise.
+    // friendly staff and circle her clockwise.
     for (var i = 0; i < TOTAL_NBRS; i++) {
 	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
 	    (view[CCW[i]].ant.type == ANT_STAFF)) {
