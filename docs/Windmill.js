@@ -1,5 +1,5 @@
 /*
- * GNi 2017-09-27, 2018-01-14
+ * GNi 2017-09-27, 2018-01-15
 
 For background and context, see:
 https://codegolf.stackexchange.com/questions/135102/formic-functions-ant-queen-of-the-hill-contest
@@ -3849,7 +3849,7 @@ function specLikeMFR() {
 	    (specTotal[LCL_MR0] + specTotal[LCL_MR2] >= 1));
 }
 
-// #future# special cases of foor markings at the MS0 level:
+// #future# special cases of food markings at the MS0 level:
 // The FOOD color reoccurs as RR0...
 
 /*
