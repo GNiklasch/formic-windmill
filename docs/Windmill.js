@@ -2724,10 +2724,9 @@ function runUMFreshCenterRailTactic() {
 	    mismatch = patternCheck(pattern, AIM_UP, 4, 1);
 	}
     } else if (myColor == LCL_RM1_WRP) {
-	// deal with propagating this to the shafthead (RR1) cell
-	// #future# We should also clear myColor to LCL_RM1?  Or leave it
-	// to the next LM passing by.  It doesn't do any harm when it stays
-	// black.
+	// Deal with propagating this to the shafthead (RR1) cell.
+	// At this point, we won't bother to revert myColor to LCL_RM1.
+	// The next miner passing by in either direction will do so.
 	pattern = PAT_GRM1_WRP;
 	debugme("- trying PAT_GRM1_WRP");
 	mismatch = patternCheck(pattern, AIM_RIGHT, 1, 1);
@@ -2873,9 +2872,10 @@ function runUMCenterRailTactic() {
 	// Deal with propagating this to the shafthead (RR1) cell.
 	// One could argue that we should also revert myColor to LCL_RM1
 	// before moving on.  At present we don't, leaving this to the
-	// next laden miner passing this spot in the other direction;
-	// keeping the temporary state here for a while does no harm and
-	// adds a small amount of redundancy.
+	// next miner passing this spot in either direction  (see below
+	// in this function body for the UM case);  keeping the temporary
+	// state here for a while does no harm and adds a small amount of
+	// redundancy.
 	pattern = PAT_GRM1_WRP;
 	debugme("- trying PAT_GRM1_WRP");
 	mismatch = patternCheck(pattern, AIM_RIGHT, 1, 1);
@@ -3268,9 +3268,11 @@ function runLMCenterRailTactic() {
 	    mismatch = patternCheck(pattern, AIM_DOWN, 3, 2);
 	}
     } else if (myColor == LCL_RM1_WRP) {
-	// This is most probably damage, otherwise an unladen miner should
-	// have dealt with this already  (except they don't (yet)...).
-	// So we'd better not try PAT_GRM1_WRP with tight quality control.
+	// This could be a shaft-has-wrapped marking left behind by
+	// a UM earlier, but it could equally well be damage, e.g.
+	// from a misplaced shaft that has gone across the rail here.
+	// So we'd better be careful and not try PAT_GRM1_WRP with
+	// tight quality control.
 	pattern = PAT_GRM1;
 	debugme("- trying PAT_GRM1 (shaft had wrapped?)");
 	mismatch = patternCheck(pattern, AIM_DOWN, 3, 2);
@@ -3280,7 +3282,7 @@ function runLMCenterRailTactic() {
 		return {cell:CCW[compass+3], color:LCL_RR1_SHAFT_EXHAUSTED};
 	    } else if (!(view[CCW[compass+7]].ant &&
 			 view[CCW[compass+7]].ant.friend)) {
-		// clear the temporary wrap marking, unless the miner
+		// Clear the temporary wrap marking, unless the miner
 		// responsible for it is still on RL1
 		return {cell:POS_CENTER, color:LCL_RM1};
 	    }
