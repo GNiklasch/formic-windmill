@@ -2918,6 +2918,18 @@ function runUMCenterRailTactic() {
 		return {cell:CCW[compass+3]};
 	    }
 	}
+	// If we're on RM0 and the RM1 cell ahead of us is wrap-coloured (black)
+	// rather than its normal blue  (possibly painted as part of a wrapped
+	// or misplaced shaft of ours),  and not occupied by a friend who might
+	// have her own ideas what to do about it, adjust it.  Otherwise we risk
+	// being lost after stepping onto it and finding the rail beyond it damaged
+	// beyond recognition.  (The pattern check would intentionally not have
+	// flagged this as a mismatch.)
+	if (myColor == LCL_RM0 &&
+	    (view[CCW[compass+5]].color == LCL_RM1_WRP) &&
+	    !(view[CCW[compass+5]].ant && view[CCW[compass+5]].ant.friend)) {
+	    return {cell:CCW[compass+5], color:LCL_RM1};
+	}
 	// Otherwise, can we step ahead?
 	var c = CCW[compass+5];
 	if (destOK[c]) {
