@@ -1460,18 +1460,9 @@ function runUMAtHomeStrategy() {
 	    return {cell:CCW[compass+5], color:LCL_RM1};
 	} else if (view[CCW[compass+6]].color != LCL_RL1) {
 	    return {cell:CCW[compass+6], color:LCL_RL1};
-	} else if ((adjFriends[ANT_STAFF] > 0) &&
-		   (view[CCW[compass+4]].color != LCL_RR1_SHAFT_EXHAUSTED)) {
-	    // This is rail1, and we avoid the first shaft since it would
-	    // wrap around to crash head-on into rail2.  Make sure it is
-	    // marked "exhausted" straight away.
-	    // (Not strictly necessary, and the first shaft from rail2 can
-	    // similarly wrap head-on into rail3...)
-	    return {cell:CCW[compass+4], color:LCL_RR1_SHAFT_EXHAUSTED};
-	} else if ((adjFriends[ANT_STAFF] == 0) &&
-		   // sanitize, but do not clear plausible settings
-		   (!LCR_GRR1[view[CCW[compass+4]].color]) &&
-		   // if a friend is already on the RR1 cell, don't interfere
+	} else if ((!LCR_GRR1[view[CCW[compass+4]].color]) &&
+		   // Sanitize, but do not clear plausible settings;
+		   // if a friend is already on the RR1 cell, don't interfere.
 		   !(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend)) {
 	    return {cell:CCW[compass+4], color:LCL_RR1};
 	}

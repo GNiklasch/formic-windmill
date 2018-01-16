@@ -1,7 +1,10 @@
-master
+Destined for master
 
 Bugfixes:
 0002 UMs at rail head confused by black cell ahead
+
+Enhancements:
+0007 Use the first possible shaft off rail1, too
 
 v1.1 2018-01-15 patch release
 
