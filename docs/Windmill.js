@@ -1688,9 +1688,14 @@ function runUMPreparingShaftStrategy() {
 	    debugme("UM at RR1: I shouldn't be drilling here");
 	    if (destOK[CCW[compass+5]]) {
 		return {cell:CCW[compass+5]};
-	    } else if (destOK[CCW[compass+4]]) { // slightly risky...
+	    } else if (destOK[CCW[compass+4]]) { // RM2, slightly risky...
 		return {cell:CCW[compass+4]};
-	    } else if (destOK[CCW[compass+6]]) {
+	    } else if (view[CCW[compass+4]].ant &&
+		       view[CCW[compass+4]].ant.friend &&
+		       destOK[CCW[compass+3]]
+		      ) { // lifelined advance to RR2
+		return {cell:CCW[compass+3]};
+	    } else if (destOK[CCW[compass+6]]) { // retreat to RM0
 		return {cell:CCW[compass+6]};
 	    } else {
 		return CELL_NOP;
