@@ -264,7 +264,7 @@ var TOTAL_NBRS = 8;
 // Expressed in controller's coordinates:
 var POS_CENTER = 4;
 var CELL_NOP = {cell:POS_CENTER};
-// directions of interest, for passing to the pattern engine:
+// Directions of interest, for passing to the pattern engine:
 var AIM_UP = 1;
 var AIM_LEFT = 3;
 var AIM_RIGHT = 5;
@@ -350,7 +350,7 @@ var PAT_GRM2B = [
 ];
 
 
-// case where shaft had wrapped, miner had left a reminder to self on RM1
+// Case where shaft had wrapped, miner had left a reminder to self on RM1
 var PAT_GRM1_WRP = [
     LCL_RL2,    LCL_RM2,    LCL_RR2,
     LCL_RL1,    LCL_RM1_WRP, LCL_RR1_SHAFT_EXHAUSTED,
@@ -388,7 +388,8 @@ var PAT_FRL2 = [
     LCR_FRLL0,  LCL_RL1,    LCR_GRM1
 ];
 
-var PAT_GRL0 = [ // general left rail edge, standing on RL0 cell, etc.
+// General left rail edge, standing on RL0 cell, etc.:
+var PAT_GRL0 = [
     LCR_FRLL1,  LCL_RL1,    LCR_GRM1,
     LCR_FRLL0,  LCL_RL0,    LCL_RM0,
     LCR_FRLL2,  LCL_RL2,    LCL_RM2
@@ -425,7 +426,7 @@ var PAT_MS0R_IN = [
     LCL_MR0,    LCL_CLEAR,  LCR_MX_IN,
     LCL_CLEAR,  LCL_CLEAR,  LCL_ML1
 ];
-// and on the way back up  (laden):
+// ...and on the way back up  (laden):
 var PAT_MS0R_OUT = [
     LCL_RR0,    LCL_RR1_SHAFT_IN_USE, LCL_RR2,
     LCL_MR0,    LCL_CLEAR,  LCR_MX_INOUT,
@@ -596,7 +597,7 @@ var compass = -1;
 
 // ---- Who am I? ----
 
-// discrepancies found during pattern matching:
+// Discrepancies found during pattern matching:
 var fwdWrong = [];
 var rearWrong = [];
 
@@ -662,7 +663,7 @@ var foodTotal = 0;
 
 specTotal[myColor]++;
 
-// inspect corner cells:
+// Inspect corner cells:
 for (i = 0; i < TOTAL_NBRS; i += 2) {
     var cell = view[CCW[i]];
     specDiagonal[cell.color]++;
@@ -678,7 +679,7 @@ for (i = 0; i < TOTAL_NBRS; i += 2) {
     }
 }
 
-// inspect edge cells:
+// Inspect edge cells:
 for (i = 1; i < TOTAL_NBRS; i += 2) {
     var cell = view[CCW[i]];
     specLateral[cell.color]++;
@@ -772,7 +773,7 @@ default:
     return CELL_NOP; // notreached
 }
 
-// ---- (ant function body ends here;  remainder is function definitions) ----
+// ---- (Ant function body ends here;  remainder is function definitions) ----
 
 // ---- Decision Tree: Second level ----
 
@@ -918,7 +919,7 @@ function runLMStrategies () {
     // laden when we've stepped up next to our queen.
     if ((friendsTotal >= 3) &&
 	(friendsTotal + foesTotal >= 4)) {
-	// congestion avoidance has high priority...
+	// Congestion avoidance has high priority...
 	return (runLMCongestionResolutionStrategy());
     } else if (adjFriends[ANT_STAFF] > 0) { // can only be the gardener
 	debugme("Laden Miner: gardener in view");
@@ -971,7 +972,7 @@ function runLMStrategies () {
 // Queen's strategies
 
 function runQueenScramblingStrategy() {
-    // still need to orient ourselves
+    // Still need to orient ourselves.
     if (unobstructed) {
 	if (foodTotal > 0) {
 	    return (runQueenScramblingEatingTactic()); // fast path
@@ -1214,7 +1215,7 @@ function runQueenOperatingMineStrategy() {
 	} else if (myFood <= THRESHOLD2) {
 	    if (destOK[CCW[0]]) {
 		return {cell:CCW[0], type:ANT_JUNIOR_MINER};
-		// #future# create miners on edge neighbor cells too,
+		// #future# Create miners on edge neighbor cells too,
 		// when the corner cells are otherwise occupied?
 	    } else {
 		// Too crowded.  Try to make ourselves useful in another way.
@@ -1466,7 +1467,7 @@ function runUMAtHomeStrategy() {
 		   !(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend)) {
 	    return {cell:CCW[compass+4], color:LCL_RR1};
 	}
-	// #future# deal with possible food on RR0 at this point
+	// #future# Deal with possible food on RR0 at this point
 	// (but only when the clock has started!)
 	// Pattern complete - step ahead when the clock is running and
 	// the road ahead is clear
@@ -1665,7 +1666,7 @@ function runUMPreparingShaftStrategy() {
 	    (view[CCW[compass]].color == LCL_MR0) &&
 	    (view[CCW[compass+1]].color == LCL_CLEAR) &&
 	    (myColor != LCL_RR1_SHAFT_EXHAUSTED)) {
-	    // propagate an "apparently exhausted" indication to RR1
+	    // Propagate an "apparently exhausted" indication to RR1.
 	    debugme("UM at RR1: finding shaft exhausted");
 	    return {cell:POS_CENTER, color:LCL_RR1_SHAFT_EXHAUSTED};
 	} else if ((myType == ANT_JUNIOR_MINER) &&
@@ -1683,7 +1684,7 @@ function runUMPreparingShaftStrategy() {
 		    (view[CCW[compass+1]].color == LCL_CLEAR) &&
 		    LCR_MX_IN[view[CCW[compass+2]].color]) // someone else is here
 		  ) {
-	    // return to mid rail, one way or another, if possible
+	    // Return to mid rail, one way or another, if possible.
 	    debugme("UM at RR1: I shouldn't be drilling here");
 	    if (destOK[CCW[compass+5]]) {
 		return {cell:CCW[compass+5]};
@@ -1697,7 +1698,7 @@ function runUMPreparingShaftStrategy() {
 	} else if (myColor != LCL_RR1_SHAFT_IN_USE) {
 	    return {cell:POS_CENTER, color:LCL_RR1_SHAFT_IN_USE};
 	} else if (mismatch < 0) {
-	    // fix a forward discrepancy
+	    // Fix a forward discrepancy.
 	    var cc = fwdWrong[0];
 	    return {cell:cc.v, color:fixup(pattern[cc.p])};
 	} else {
@@ -1726,7 +1727,7 @@ function runUMPreparingShaftStrategy() {
 	    }
 	}
     }
-    // don't know what I am doing here...
+    // Don't know what I am doing here...
     return (runLostMinerStrategy(false));
 }
 
@@ -1742,7 +1743,7 @@ function runUMEnteringShaftStrategy() {
 }
 
 function runUMDrillingShaftStrategy() {
-    // check the four shaft pattern phases...
+    // Check the four shaft pattern phases...
     var pattern;
     var mismatch;
     if ((specLateral[LCL_ML3] >= 1) &&
@@ -1760,7 +1761,7 @@ function runUMDrillingShaftStrategy() {
     }
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
-	// check for possible wraparound onto the head of the next rail.
+	// Check for possible wraparound onto the head of the next rail.
 	// We only do this for these first two patterns, so as not to be too
 	// easily confused when we drill into unknown random ground;  at worst
 	// we might already have obliterated a short stretch of rail before we
@@ -1780,8 +1781,8 @@ function runUMDrillingShaftStrategy() {
 	    if (destOK[CCW[compass]]) {
 		return {cell:CCW[compass]};
 	    } else if (destOK[CCW[compass+1]]) {
-		// try the apparent RR0 cell instead  (risky - we might not
-		// recognize it as such once we stand on it, even it is!)
+		// Try the apparent RR0 cell instead  (risky - we might not
+		// recognize it as such once we stand on it, even it is!).
 		return {cell:CCW[compass+1]};
 	    } else {
 		debugme("Too crowded to try switching to the rail.");
@@ -2001,7 +2002,7 @@ function runLMLeavingRightWallStrategy() {
 
 function runLMAscendingShaftStrategy() {
     // Mirror image of runUMDrillingShaftStrategy().
-    // check the four shaft pattern phases...
+    // Check the four shaft pattern phases...
     var pattern;
     var mismatch;
     if ((specLateral[LCL_ML3] >= 1) &&
@@ -2044,7 +2045,7 @@ function runLMAscendingShaftStrategy() {
 	}
 	pattern = PAT_MS0_WRAPPING;
 	debugme("- trying PAT_MS0_WRAPPING");
-	// take the short route onto the rail rather than the long one...
+	// Take the short route onto the rail rather than the long one...
 	mismatch = patternCheck(pattern, AIM_DOWN, 0, 1);
 	if (compass >= 0) {
 	    debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
@@ -2115,7 +2116,7 @@ function runLMLeavingVacantShaftStrategy() {
 	    return {cell:CCW[compass+5]};
 	} else if (view[CCW[compass+5]].ant && view[CCW[compass+5]].ant.friend &&
 		   destOK[CCW[compass+6]]) {
-	    // try stepping around our friend (who might wish to drill here) to RR0
+	    // Try stepping around our friend (who might wish to drill here) to RR0.
 	    return {cell:CCW[compass+6]};
 	} else {
 	    return CELL_NOP; // hope and wait for the obstacles to go away
@@ -2136,7 +2137,7 @@ function runLMDepartingFromShaftStrategy() {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	if ((view[CCW[compass]].color == LCL_MR0) &&
 	    (view[CCW[compass+1]].color == LCL_CLEAR)) {
-	    // make sure RR1 reflects the state of the adjacent shaft head
+	    // Make sure RR1 reflects the state of the adjacent shaft head.
 	    if ((view[CCW[compass+2]].color == LCL_MX_M3OUT) &&
 		(myColor != LCL_RR1_SHAFT_EXHAUSTED)) {
 		return {cell:POS_CENTER, color:LCL_RR1_SHAFT_EXHAUSTED};
@@ -2147,12 +2148,12 @@ function runLMDepartingFromShaftStrategy() {
 		       (myColor != LCL_RR1_SHAFT_IN_USE)) {
 		return {cell:POS_CENTER, color:LCL_RR1_SHAFT_IN_USE};
 	    } else if (mismatch < 0) {
-		// fix a forward discrepancy
+		// Fix a forward discrepancy.
 		var cc = fwdWrong[0];
 		return {cell:cc.v, color:fixup(pattern[cc.p])};
 	    }
 	}
-	// return to center rail, one way or another, if possible
+	// Return to center rail, one way or another, if possible.
 	if (destOK[CCW[compass+5]]) {
 	    return {cell:CCW[compass+5]};
 	} else if (destOK[CCW[compass+6]]) {
@@ -2164,7 +2165,7 @@ function runLMDepartingFromShaftStrategy() {
 	    return CELL_NOP; // too crowded...
 	}
     }
-    // don't know what I am doing here...
+    // Don't know what I am doing here...
     return (runLostMinerStrategy(false));
 }
 
@@ -2451,8 +2452,8 @@ function runQueenScramblingSnatchingTactic() {
 }
 
 function runQueenScramblingTrailCheckTactic() {
-    // assert: unobstructed; myColor != LCL_TRAIL
-    // still need to orient ourselves
+    // Assert: unobstructed; myColor != LCL_TRAIL
+    // Still need to orient ourselves.
     if ((myColor != LCL_CLEAR) && (specNbrs[myColor] >= 4)) {
 	debugme("Queen:  Yuck!");
 	// Oooh, we've stepped into gooo.
@@ -2461,7 +2462,7 @@ function runQueenScramblingTrailCheckTactic() {
 	    // We don't know where we are anyway...
 	    return {cell:POS_CENTER, color:LCL_TRAIL};
 	} else if (specNbrs[LCL_TRAIL] >= 3) {
-	    // beam me up...
+	    // Beam me up...
 	    return {cell:POS_CENTER, color:LCL_TRAIL};
 	} else {
 	    // Loop will find something since at most two neighbor cells
@@ -2492,22 +2493,22 @@ function runQueenScramblingTrailCheckTactic() {
 		} else if (view[CCW[i+7]].color == LCL_CLEAR) {
 		    return { cell:CCW[i+7]};
 		} else {
-		    // back to plan A:  mark our present cell
+		    // Back to plan A:  mark our present cell.
 		    return {cell:POS_CENTER, color:LCL_TRAIL};
 		}
 	    }
 	}
-	// back to plan A:  mark our present cell
+	// Back to plan A:  mark our present cell.
 	return {cell:POS_CENTER, color:LCL_TRAIL};
     } else {
-	// back to plan A:  mark our present cell
+	// Back to plan A:  mark our present cell.
 	return {cell:POS_CENTER, color:LCL_TRAIL};
     }
     return CELL_NOP; // notreached
 }
 
 function runQueenScramblingAroundTactic() {
-    // assert unobstructed, myColor == LCL_TRAIL
+    // Assert unobstructed, myColor == LCL_TRAIL
     // Still need to orient ourselves.  Find a promising direction.
     // First attempt, intentionally lopsided:
     for (var i = 0; i < TOTAL_NBRS; i++) {
@@ -2541,8 +2542,8 @@ function runQueenScramblingAroundTactic() {
 }
 
 function runQueenPrepareToSettleTactic() {
-    // assert unobstructed, compass not set
-    // paint our surroundings white before creating the gardener
+    // Assert unobstructed, compass not set.
+    // Paint our surroundings white before creating the gardener.
     if (myColor != LCL_QC_RESET) {
 	return {cell:POS_CENTER, color:LCL_QC_RESET};
     }
@@ -2575,26 +2576,26 @@ function runQueenScramblingEvasionTactic() {
 	} else if (destOK[CCW[compass+5]] && destOK[CCW[compass+6]] &&
 		   destOK[CCW[compass+7]] && destOK[CCW[compass]] &&
 		   destOK[CCW[compass+1]]) {
-	    // move down if other ants are only in the righthand three cells
+	    // Move down if other ants are only in the righthand three cells...
 	    return {cell:CCW[compass+7]};
 	} else if (destOK[CCW[compass+3]] && destOK[CCW[compass+4]] &&
 		   destOK[CCW[compass+5]]) {
-	    // carry on to upper right if three adjacent cells are clear, etc
+	    // ...carry on to upper right if three adjacent cells are clear, etc...
 	    return {cell:CCW[compass+4]};
 	} else if (destOK[CCW[compass+5]] && destOK[CCW[compass+6]] &&
 		   destOK[CCW[compass+7]]) {
-	    // turn to upper left
+	    // ...turn to upper left...
 	    return {cell:CCW[compass+6]};
 	} else if (destOK[CCW[compass+1]] && destOK[CCW[compass+2]] &&
 		   destOK[CCW[compass+3]]) {
-	    // turn to lower right
+	    // ...turn to lower right...
 	    return {cell:CCW[compass+2]};
 	} else if (destOK[CCW[compass+7]] && destOK[CCW[compass]] &&
 		   destOK[CCW[compass+1]]) {
-	    // double back (sigh)
+	    // ...double back (sigh)...
 	    return {cell:CCW[compass]};
 	} else {
-	    // aim in any unoccupied direction (if there is one)
+	    // ...or aim in any unoccupied direction (if there is one).
 	    for (i = 0; i < TOTAL_NBRS; i++) {
 		if (destOK[CCW[i]]) {
 		    return {cell:CCW[i]};
@@ -2603,7 +2604,7 @@ function runQueenScramblingEvasionTactic() {
 	    return CELL_NOP;
 	}
     } else { // lost sight of trail, too
-	// aim into empty space, as far as possible
+	// Aim into empty space, as far as possible.
 	for (var i = 0; i < TOTAL_NBRS; i++) {
 	    if (destOK[CCW[i]] && destOK[CCW[i+1]] &&
 		destOK[CCW[i+2]] && destOK[CCW[i+3]] &&
@@ -2667,7 +2668,7 @@ function runGardenerGardeningTactic() {
 function runUMFreshCenterRailTactic() {
     // Assert:  spectrum suggests we're on mid rail;
     // freshRail is true iff our engineer is in view.
-    // #future# review this -- could the "weird" cases benefit from
+    // #future# Review this -- could the "weird" cases benefit from
     // additional specLateral or specDiagonal checks?
     var pattern;
     var mismatch;
@@ -2730,11 +2731,11 @@ function runUMFreshCenterRailTactic() {
     if (compass < 0) { // still no idea where I am, give up
 	return (runLostMinerStrategy(false));
     }
-    // assert compass is now set
+    // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
     if (mismatch == 0) { // perfect pattern match
 	if (foodLateral > 0) {
-	    // any food which it is now time to grab?
+	    // Any food which it is now time to grab?
 	    if ((view[CCW[compass+7]].food > 0) && destOK[CCW[compass+7]]) {
 		return {cell:CCW[compass+7]};
 	    } else if ((view[CCW[compass+3]].food > 0) &&
@@ -2791,11 +2792,11 @@ function runUMFreshCenterRailTactic() {
 	}
     }
     if (mismatch < 0) {
-	// fix a forward discrepancy
+	// Fix a forward discrepancy.
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else { // (mismatch > 0)
-	// fix a discrepancy behind us
+	// Fix a discrepancy behind us.
 	var cc = rearWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     }
@@ -2805,7 +2806,7 @@ function runUMFreshCenterRailTactic() {
 function runUMCenterRailTactic() {
     // Assert:  spectrum suggests we're on mid rail;
     // our engineer is _not_ in view.
-    // #future# review this -- could the "weird" cases benefit from
+    // #future# Review this -- could the "weird" cases benefit from
     // additional specLateral or specDiagonal checks?
     var pattern;
     var mismatch;
@@ -2881,7 +2882,7 @@ function runUMCenterRailTactic() {
     if (compass < 0) { // still no idea where I am, give up
 	return (runLostMinerStrategy(false));
     }
-    // assert compass is now set
+    // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
     if (mismatch == 0) { // perfect pattern match
 	if (foodLateral > 0) {
@@ -2938,26 +2939,26 @@ function runUMCenterRailTactic() {
 	    }
 	    if (evade) {
 		if (destOK[CCW[compass+4]]) {
-		    // pass them by stepping diagonally onto the right rail edge
+		    // Pass them by stepping diagonally onto the right rail edge.
 		    return {cell:CCW[compass+4]};
 		} else if (destOK[CCW[compass+3]]) {
-		    // step sideways onto the right rail edge
+		    // Step sideways onto the right rail edge.
 		    return {cell:CCW[compass+3]};
 		} else { // let the other(s) deal with it first
 		    return CELL_NOP;
 		}
 	    } else {
-		// wait and see whether this clears itself up before more
-		// friends come up from behind
+		// Wait and see whether this clears itself up before more
+		// friends come up from behind.
 		return CELL_NOP;
 	    }
 	}
     } else if (mismatch < 0) {
-	// fix a forward discrepancy
+	// Fix a forward discrepancy.
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else { // (mismatch > 0)
-	// fix a discrepancy behind us
+	// Fix a discrepancy behind us.
 	var cc = rearWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     }
@@ -2972,7 +2973,7 @@ function runUMEnteringShaftTactic(pattern, mismatch) {
     // we could conceivably have got an upside-down match.  We'll
     // either end up back on RR1, or lost.  But then in this case
     // we shouldn't have stepped onto this cell in the first place...
-    // #future# deal with food at this level (without using the HOME color)!
+    // #future# Deal with food at this level (without using the HOME color)!
     debugme("UMEnteringShaftTactic...");
     switch (view[CCW[compass+3]].color) {
     case LCL_MX_M0: // we're the first person down
@@ -3005,11 +3006,11 @@ function runUMEnteringShaftTactic(pattern, mismatch) {
     default: // confused
 	break;
     }
-    // if we get here, we shouldn't be standing in this cell...
+    // If we get here, we shouldn't be standing in this cell...
     if (destOK[CCW[compass+5]]) { // try stepping back to RR1
 	return {cell:CCW[compass+5]};
     }
-    // #future# deal with congestion here, too?
+    // #future# Deal with congestion here, too?
     return CELL_NOP;
 }
 
@@ -3087,7 +3088,7 @@ function runUMDrillingShaftTactic(pattern, mismatch) {
 		    return CELL_NOP;
 		}
 	    } else {
-		// wait behind an unladen buddy, or obstruct a foe
+		// Wait behind an unladen buddy, or obstruct a foe.
 		return CELL_NOP;
 	    }
 	}
@@ -3101,19 +3102,19 @@ function runUMWrappingOntoRailTactic(pattern, mismatch) {
     if (view[CCW[compass+3]].color != LCL_MS_WRP) {
 	return {cell:CCW[compass+3], color:LCL_MS_WRP};
     } else if (mismatch < 0) {
-	// fix a forward discrepancy (can't really happen)
+	// Fix a forward discrepancy (can't really happen).
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else if (destOK[CCW[compass+1]]) {
-	// step onto the presumed RL1 cell
+	// Step onto the presumed RL1 cell.
 	return {cell:CCW[compass+1]};
     }
-    // otherwise wait for the obstacle to disappear
+    // Otherwise, wait for the obstacle to disappear.
     return CELL_NOP;
 }
 
 function runLMLeavingLeftWallTactic() {
-    // Assert: compass is set, one PAT_MSnFL has matched
+    // Assert:  compass is set, one PAT_MSnFL has matched
     debugme("LMLeavingLeftWallTactic...");
     if (destOK[CCW[compass+7]]) {
 	return {cell:CCW[compass+7]};
@@ -3123,7 +3124,7 @@ function runLMLeavingLeftWallTactic() {
 }
 
 function runLMLeavingRightWallTactic() {
-    // Assert: compass is set, one PAT_MSnFR has matched
+    // Assert:  compass is set, one PAT_MSnFR has matched
     debugme("LMLeavingRightWallTactic...");
     if (destOK[CCW[compass+3]]) {
 	return {cell:CCW[compass+3]};
@@ -3133,7 +3134,7 @@ function runLMLeavingRightWallTactic() {
 }
 
 function runLMWrappingOntoRailTactic(pattern, mismatch) {
-    // Assert: compass is set, PAT_MS0_WRAPPING has matched.
+    // Assert:  compass is set, PAT_MS0_WRAPPING has matched.
     debugme("LMWrappingOntoRailTactic...");
     // #future# (hasn't yet occurred often enough to look worth the effort)
     return CELL_NOP; // placeholder
@@ -3167,7 +3168,7 @@ function runLMAscendingShaftTactic(pattern, mismatch) {
 }
 
 function runLMLeavingShaftTactic(pattern, mismatch) {
-    // Assert: compass is set (PAT_MS0R_IN having matched) but the
+    // Assert:  compass is set (PAT_MS0R_IN having matched) but the
     // mismatch has been recomputed based on PAT_MS0R_OUT, or the
     // latter has matched straight away.
     debugme("LMLeavingShaftTactic...");
@@ -3179,8 +3180,8 @@ function runLMLeavingShaftTactic(pattern, mismatch) {
 	    debugme("LM: Friend on RR1, deferring to her for now");
 	    return CELL_NOP;
 	}
-	// fix any forward discrepancy first (e.g. if IN_USE got lost)
-	// #future# review this... can this overpaint MX prematurely?
+	// Fix any forward discrepancy first (e.g. if IN_USE got lost).
+	// #future# Review this... can this overpaint MX prematurely?
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     }
@@ -3210,7 +3211,7 @@ function runLMCenterRailTactic() {
     // we turn around towards the queen and have unpainted territory to
     // our rear.  The trust setting allows to set our compass for the
     // homeward journey without the rear discrepancies worrying us too much.
-    // #future# review this -- could the "weird" cases benefit from
+    // #future# Review this -- could the "weird" cases benefit from
     // additional specLateral or specDiagonal checks?
     var pattern;
     var mismatch;
@@ -3282,7 +3283,7 @@ function runLMCenterRailTactic() {
     if (compass < 0) { // still no idea where I am, give up
 	return (runLostMinerStrategy(false));
     }
-    // assert compass is now set
+    // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
     if (mismatch == 0) { // perfect pattern match
 	// Can we step homeward?  NB food can't be an obstacle unless we
@@ -3313,17 +3314,17 @@ function runLMCenterRailTactic() {
 		    return CELL_NOP;
 		}
 	    } else {
-		// wait and see whether this clears itself up before more
-		// friends come up from behind
+		// Wait and see whether this clears itself up before more
+		// friends come up from behind.
 		return CELL_NOP;
 	    }
 	}
     } else if (mismatch < 0) {
-	// fix a forward discrepancy
+	// Fix a forward discrepancy.
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else { // (mismatch > 0)
-	// fix a discrepancy behind us
+	// Fix a discrepancy behind us.
 	var cc = rearWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     }
@@ -3331,7 +3332,7 @@ function runLMCenterRailTactic() {
 }
 
 function runLMLeaveRLTactic() {
-    // Assert: pattern has matched, compass is set
+    // Assert:  pattern has matched, compass is set.
     if (view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend &&
 	destOK[CCW[compass+2]]) {
 	// lifelined descent
@@ -3389,15 +3390,15 @@ function runEngineerLeavingGardenTactic() {
 	// Only step forward when a friend will remain in view.
 	return {cell:CCW[compass+5]};
     } else if (mismatch < 0) {
-	// fix a forward discrepancy
+	// Fix a forward discrepancy.
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else if (mismatch > 0) {
-	// fix a discrepancy behind us
+	// Fix a discrepancy behind us.
 	var cc = rearWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else {
-	// wait for the buddy to catch up with us
+	// Wait for the buddy to catch up with us.
 	return CELL_NOP;
     }
     return CELL_NOP; // notreached
@@ -3465,7 +3466,7 @@ function runEngineerBuildingRailTactic() {
 	    debugme("- trying PAT_FRL1");
 	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
 	}
-	// #future# garden-ahead case would go here  (separate pattern needed)
+	// #future# Garden-ahead case would go here  (separate pattern needed).
 	if (compass < 0) { // still no idea where I am, give up and wait
 	    return CELL_NOP;
 	}
@@ -3494,7 +3495,7 @@ function runEngineerBuildingRailTactic() {
 	debugme("Engineer: You must be kidding (whoever you are).");
 	return {cell:POS_CENTER, color:LCL_RL0};
     }
-    // assert compass is now set
+    // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
     if ((mismatch == 0) && destOK[CCW[compass+5]] &&
 	((view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend) ||
@@ -3502,15 +3503,15 @@ function runEngineerBuildingRailTactic() {
 	// Only step forward when a friend will remain in view.
 	return {cell:CCW[compass+5]};
     } else if (mismatch < 0) {
-	// fix a forward discrepancy
+	// Fix a forward discrepancy.
 	var cc = fwdWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else if (mismatch > 0) {
-	// fix a discrepancy behind us
+	// Fix a discrepancy behind us.
 	var cc = rearWrong[0];
 	return {cell:cc.v, color:fixup(pattern[cc.p])};
     } else {
-	// wait for the buddy to catch up with us
+	// Wait for the buddy to catch up with us.
 	return CELL_NOP;
     }
     return CELL_NOP; // notreached
@@ -3667,7 +3668,7 @@ function patternCheckOrientation(pattern, targetCell, qualityGoal, weight, orien
 	    return PAT_NOMATCH;
 	}
     }
-    // Assert totalDiscrepancies == fwdWrong.length + rearWrong.length;
+    // Assert:  totalDiscrepancies == fwdWrong.length + rearWrong.length;
     // Assert:  If compass < 0, then totalDiscrepancies <= qualityGoal
     debugme("-> total " + totalDiscrepancies + " weighted discrepancies found.");
     if ((compass < 0)
@@ -3676,7 +3677,7 @@ function patternCheckOrientation(pattern, targetCell, qualityGoal, weight, orien
 	compass = orientation;
     }
     if (DEBUGME[myType]) {
-	// bypass the single-arg debugme() in order to get the objects printed
+	// Bypass the single-arg debugme() in order to get the objects printed.
 	DEBUG_PATTERN_CHECK_VERBOSELY && console.log("forwardD: [", fwdWrong, "]");
 	DEBUG_PATTERN_CHECK_VERBOSELY && console.log("rearD:    [", rearWrong, "]");
     }
@@ -3771,7 +3772,7 @@ function specLikeRL1() {
 }
 
 function specLikeRL02() {
-    // can't meaningfully check LCL_RM2 separately here
+    // Can't meaningfully check LCL_RM2 separately here.
     return ((myColor == LCL_RL0) && // same as LCL_RL2
 	    (specLateral[LCL_RL1] + specLateral[LCL_RL2] >= 2) &&
 	    (specNbrs[LCL_RM0] >= 1) &&
