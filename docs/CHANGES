@@ -1,19 +1,19 @@
-Destined for master
+## In work
 
-Bugfixes:
+### Bugfixes:
 0002 UMs at rail head confused by black cell ahead
 
-Enhancements:
+### Enhancements:
 0007 Use the first possible shaft off rail1, too
 
-v1.1 2018-01-15 patch release
+## v1.1 2018-01-15 patch release
 
-Bugfixes:
+### Bugfixes:
 0005 Shaft/rail wraparound detection
 0006 Disqualified: new worker on top of another ant
 
-Enhancements:
+### Enhancements:
 0001 LMs can get stuck next to the gardener
 0004 UM/LM clash at shaft head
 
-v1.0 2017-09-28 initial release
+## v1.0 2017-09-28 initial release
