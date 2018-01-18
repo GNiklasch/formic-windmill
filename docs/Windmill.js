@@ -2100,6 +2100,10 @@ function runLMLeavingShaftStrategy() {
     } else if (specLikeCenterShaft()) {
 	debugme("Laden Miner: spectrum also resembles mine shaft");
 	return (runLMAscendingShaftStrategy());
+    } else {
+	// Can happen when we've stepped onto food at MS0 before
+	// having had time to paint - or even look! - further ahead.
+	return (runLostMinerStrategy(false));
     }
     return CELL_NOP; // notreached
 }

@@ -2,6 +2,7 @@
 
 ### Bugfixes:
 0002 UMs at rail head confused by black cell ahead
+0011 Food right at the shaft head can get the miner confused and stuck
 
 ### Enhancements:
 0007 Use the first possible shaft off rail1, too
