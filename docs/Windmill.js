@@ -2146,7 +2146,14 @@ function runLMDepartingFromShaftStrategy() {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	if ((view[CCW[compass]].color == LCL_MR0) &&
 	    (view[CCW[compass+1]].color == LCL_CLEAR)) {
-	    // Make sure RR1 reflects the state of the adjacent shaft head.
+	    // Propagate a possible shaft-exhausted marking to the shaft head.
+	    // (This can happen when an LM had strayed into a shaft whose
+	    // original driller had previously wrapped onto the rail.)
+	    if ((myColor == LCL_RR1_SHAFT_EXHAUSTED) &&
+		(view[CCW[compass+2]].color != LCL_MX_M3OUT)) {
+		return {cell:CCW[compass+2], color:LCL_MX_M3OUT};
+	    }
+	    // Otherwise make sure RR1 reflects the state of the adjacent shaft head.
 	    if ((view[CCW[compass+2]].color == LCL_MX_M3OUT) &&
 		(myColor != LCL_RR1_SHAFT_EXHAUSTED)) {
 		return {cell:POS_CENTER, color:LCL_RR1_SHAFT_EXHAUSTED};
@@ -3289,7 +3296,15 @@ function runLMCenterRailTactic() {
 	    }
 	}
     }
-    if (compass < 0) { // still no idea where I am, give up
+    if (compass < 0) {
+	if (specLikeRR1()) {
+	    // Can happen when an LM had strayed into a shaft which had
+	    // wrapped in the meantime, and both RR1 and RM1 are still
+	    // painted to reflect this fact.
+	    debugme("Laden Miner: spectrum also resembles RR1");
+	    return (runLMDepartingFromShaftStrategy());
+	}
+	// Still no idea where I am, give up.
 	return (runLostMinerStrategy(false));
     }
     // Assert:  compass is now set.
