@@ -1621,7 +1621,7 @@ function runUMLeaveRL02Strategy() {
 function runUMLeaveRR0Strategy() {
     var pattern = PAT_GRR0;
     debugme("- trying PAT_GRR0");
-    mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
+    var mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	return (runUMLeaveRRTactic());
@@ -1635,7 +1635,7 @@ function runUMLeaveRR0Strategy() {
 function runUMLeaveRR2Strategy() {
     var pattern = PAT_GRR2;
     debugme("- trying PAT_GRR2");
-    mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
+    var mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	return (runUMLeaveRRTactic());
@@ -2268,7 +2268,7 @@ function runLMLeaveRL02Strategy() {
 function runLMLeaveRR0Strategy() {
     var pattern = PAT_GRR0;
     debugme("- trying PAT_GRR0");
-    mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
+    var mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	return (runLMLeaveRRTactic());
@@ -2282,7 +2282,7 @@ function runLMLeaveRR0Strategy() {
 function runLMLeaveRR2Strategy() {
     var pattern = PAT_GRR2;
     debugme("- trying PAT_GRR2");
-    mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
+    var mismatch = patternCheck(pattern, AIM_LEFT, 2, 1);
     if (compass >= 0) {
 	debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
 	return (runLMLeaveRRTactic());
