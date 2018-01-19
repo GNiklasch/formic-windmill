@@ -1,4 +1,4 @@
-var AJM=1;var ASM=2;var AE=3;var ASF=4;var AQ=5;var DPCV=false;var RW=true;var TH0=0;var TH1=8;var TH2=17;var TH3=67;var TH4=120;var TH5=390;var RM=7;var RD=4;var PW=1;var PY=2;var PP=3;var PC=4;var PR=5;var PG=6;var PB=7;var PK=8;var LN=0;var LCLR=PW;var LT=PB;var LA=PP;var LRL0=PC;var LRL1=PG;var LRL2=LRL0;var LRM0=PR;var LRM1=PB;var LRM1_WRP=PK;var LRM2=PG;var LRR0=PG;var LRR1=PW;var LRR1U=PR;var LRR1V=PY;var LRR1X=PK;var LRR2=PY;var LMX_M0=LCLR;var LMX_M1IN=PC;var LMX_M1OUT=PY;var LMX_M2IN=PP;var LMX_M2OUT=PR;var LMX_M3IN=PB;var LMX_M3OUT=PK;var LMS_WRP=PK;var LMR0=PK;var LML1=PY;var LMR2=PR;var LML3=PC;var LMMF=PG;var LMMH=PP;var LG3=PK;var LG4=PR;var LG5=PK;var LG6=PB;var LP0=LCLR;var LPB=PC;var LPG=PY;var LPG1=PR;var LPX=PP;var FALSE_X9=[false,false,false,false,false,false,false,false,false];
+var AJM=1;var ASM=2;var AE=3;var ASF=4;var AQ=5;var RW=true;var TH0=0;var TH1=8;var TH2=17;var TH3=67;var TH4=120;var TH5=390;var RM=7;var RD=4;var PW=1;var PY=2;var PP=3;var PC=4;var PR=5;var PG=6;var PB=7;var PK=8;var LN=0;var LCLR=PW;var LT=PB;var LA=PP;var LRL0=PC;var LRL1=PG;var LRL2=LRL0;var LRM0=PR;var LRM1=PB;var LRM1_WRP=PK;var LRM2=PG;var LRR0=PG;var LRR1=PW;var LRR1U=PR;var LRR1V=PY;var LRR1X=PK;var LRR2=PY;var LMX_M0=LCLR;var LMX_M1IN=PC;var LMX_M1OUT=PY;var LMX_M2IN=PP;var LMX_M2OUT=PR;var LMX_M3IN=PB;var LMX_M3OUT=PK;var LMS_WRP=PK;var LMR0=PK;var LML1=PY;var LMR2=PR;var LML3=PC;var LMMF=PG;var LMMH=PP;var LG3=PK;var LG4=PR;var LG5=PK;var LG6=PB;var LP0=LCLR;var LPB=PC;var LPG=PY;var LPG1=PR;var LPX=PP;var FALSE_X9=[false,false,false,false,false,false,false,false,false];
 var UNDEF_X9=[undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined,undefined];
 var QCPERD=6;var LCL_QC_RESET=LCLR;var LCRQC=[PY,PP,PC,PR,PG,PK];var LCRQCVAL=Array.from(FALSE_X9);
 var LCRQC_VALUE=Array.from(UNDEF_X9);
@@ -93,9 +93,7 @@ return {cell:CCW[xn+7],color:LRL0};
 return {cell:CCW[xn+5],color:LRM1};
 } else if (view[CCW[xn+6]].color!=LRL1) {
 return {cell:CCW[xn+6],color:LRL1};
-} else if ((aF[ASF]>0)&&(view[CCW[xn+4]].color!=LRR1X)) {
-return {cell:CCW[xn+4],color:LRR1X};
-} else if ((aF[ASF]==0)&&(!LCRGRR1[view[CCW[xn+4]].color])&&
+} else if ((!LCRGRR1[view[CCW[xn+4]].color])&&
 !(view[CCW[xn+4]].ant&&view[CCW[xn+4]].ant.friend)) {
 return {cell:CCW[xn+4],color:LRR1};
 }if (LCRQCVAL[view[CCW[xn]].color]) {
@@ -119,7 +117,8 @@ LCRMX_OUT[view[CCW[xn+2]].color]) {
 return {cell:POSC,color:LRR1V};
 } else if ((mC==LRR1X)||((mT==AJM)&&(mC==LRR1V))||((mC==LRR1U)&&(view[CCW[xn]].color==LMR0)&&(view[CCW[xn+1]].color==LCLR)&&
 LCRMX_IN[view[CCW[xn+2]].color])
-) {if (dOK[CCW[xn+5]]) {return {cell:CCW[xn+5]};} else if (dOK[CCW[xn+4]]) {return {cell:CCW[xn+4]};} else if (dOK[CCW[xn+6]]) {return {cell:CCW[xn+6]};} else {return NOP;}} else if (mC!=LRR1U) {return {cell:POSC,color:LRR1U};
+) {if (dOK[CCW[xn+5]]) {return {cell:CCW[xn+5]};} else if (dOK[CCW[xn+4]]) {return {cell:CCW[xn+4]};} else if (view[CCW[xn+4]].ant&&
+view[CCW[xn+4]].ant.friend&&dOK[CCW[xn+3]]) {return {cell:CCW[xn+3]};} else if (dOK[CCW[xn+6]]) {return {cell:CCW[xn+6]};} else {return NOP;}} else if (mC!=LRR1U) {return {cell:POSC,color:LRR1U};
 } else if (msm<0) {var cc=fwdWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
 } else {if (dOK[c]) {return {cell:c};} else if (view[c].ant&&view[c].ant.friend) {
 if (dOK[CCW[xn+5]]) {return {cell:CCW[xn+5]};} else if (dOK[CCW[xn+4]]) {return {cell:CCW[xn+4]};} else if (dOK[CCW[xn+6]]) {return {cell:CCW[xn+6]};} else {return NOP;}} else {return NOP;}}}return (rLostMSy(false));}function rUESSy() {var ptrn=PTMS0R_IN;var msm=patC(ptrn,AIMD,4,2);if (xn>=0) {return (rUESTc(ptrn,msm));}return (rLostMSy(false));}function rUDSSy() {var ptrn;var msm;if ((sL[LML3]>=1)&&(sD[LMR2]+sD[LMR0]>=1)) {ptrn=PTMS3;msm=patC(ptrn,AIMD,3,2);}if ((xn<0)&&(sL[LMR2]>=1)&&(sD[LML1]+sD[LML3]>=1)) {ptrn=PTMS2;msm=patC(ptrn,AIMD,3,2);}if (xn>=0) {if ((msm<0)&&(view[CCW[xn]].color==LRM0)&&(view[CCW[xn+1]].color==LRR0)&&
@@ -133,12 +132,14 @@ return {cell:CCW[i-1]};}}return NOP;}function rLLLWSy() {var ptrn;var msm;if (mC
 ptrn=PTMS0FL;msm=patC(ptrn,AIML,0,1);if (xn<0) {ptrn=PTMS2FL;msm=patC(ptrn,AIML,0,1);}if (xn>=0) {return (rLLLWTc());}} else if (spcMFR()) {return (rLLRWSy());} else if (spcMS()) {return (rLASSy());}return (rLostMSy(false));}function rLLRWSy() {var ptrn;var msm;if (mC==LMR0) {ptrn=PTMS0FR;msm=patC(ptrn,AIMR,0,1);if (xn>=0) {return (rLLRWTc());}} else if (mC==LMR2) {ptrn=PTMS2FR;msm=patC(ptrn,AIMR,0,1);if (xn>=0) {return (rLLRWTc());}} else if (sL[LMR0]+sL[LMR2]>=2) {
 ptrn=PTMS1FR;msm=patC(ptrn,AIMR,0,1);if (xn<0) {ptrn=PTMS3FR;msm=patC(ptrn,AIMR,0,1);}if (xn>=0) {return (rLLRWTc());}} else if (spcMS()) {return (rLASSy());}return (rLostMSy(false));}function rLASSy() {var ptrn;var msm;if ((sL[LML3]>=1)&&(sD[LMR2]+sD[LMR0]>=1)) {ptrn=PTMS3;msm=patC(ptrn,AIMU,3,2);}if ((xn<0)&&(sL[LMR2]>=1)&&(sD[LML1]+sD[LML3]>=1)) {ptrn=PTMS2;msm=patC(ptrn,AIMU,3,2);}if ((xn<0)&&(sL[LML1]>=1)&&(sD[LMR0]+sD[LMR2]>=1)) {ptrn=PTMS1_IO;msm=patC(ptrn,AIMU,0,1);if (xn<0) {ptrn=PTMS1;msm=patC(ptrn,AIMU,3,2);}}if (xn>=0) {return (rLASTc(ptrn,msm));}if ((sD[LML3]+sL[LMR0]>=2)&&(sD[LRL0] >=2)&&(sD[LML1]==0)) {
 ptrn=PTMS0_OUT;msm=patC(ptrn,AIMU,0,1);if (xn>=0) {return {cell:CCW[xn+3],color:LCLR};
-}ptrn=PTMS0_WRAPPING;msm=patC(ptrn,AIMD,0,1);if (xn>=0) {return (rLWRTc(ptrn,msm));}}if ((sL[LMR0]>=1)&&(sD[LML3]+sD[LML1]>=1)) {ptrn=PTMS0;msm=patC(ptrn,AIMU,3,2);if (xn>=0) {return (rLASTc(ptrn,msm));}}if (spcRM()) {return (rLTRRSy());}return (rLostMSy(false));}function rLLSSy() {var ptrn=PTMS0R_OUT;var msm=patC(ptrn,AIMU,0,1);if (xn>=0) {} else {ptrn=PTMS0R_IN;msm=patC(ptrn,AIMU,4,2);if (xn>=0) {ptrn=PTMS0R_OUT;msm=patC(ptrn,AIMU,0,1);}}if (xn>=0) {return (rLLSTc(ptrn,msm));} else if (spcMS()) {return (rLASSy());}return NOP;}function rLLVSSy() {var ptrn=PTMS0R_OUT1;var msm=patC(ptrn,AIMU,0,1);if (xn>=0) {if (view[CCW[xn+3]].color==LCLR) {
+}ptrn=PTMS0_WRAPPING;msm=patC(ptrn,AIMD,0,1);if (xn>=0) {return (rLWRTc(ptrn,msm));}}if ((sL[LMR0]>=1)&&(sD[LML3]+sD[LML1]>=1)) {ptrn=PTMS0;msm=patC(ptrn,AIMU,3,2);if (xn>=0) {return (rLASTc(ptrn,msm));}}if (spcRM()) {return (rLTRRSy());}return (rLostMSy(false));}function rLLSSy() {var ptrn=PTMS0R_OUT;var msm=patC(ptrn,AIMU,0,1);if (xn>=0) {} else {ptrn=PTMS0R_IN;msm=patC(ptrn,AIMU,4,2);if (xn>=0) {ptrn=PTMS0R_OUT;msm=patC(ptrn,AIMU,0,1);}}if (xn>=0) {return (rLLSTc(ptrn,msm));} else if (spcMS()) {return (rLASSy());} else {return (rLostMSy(false));}return NOP;}function rLLVSSy() {var ptrn=PTMS0R_OUT1;var msm=patC(ptrn,AIMU,0,1);if (xn>=0) {if (view[CCW[xn+3]].color==LCLR) {
 return {cell:CCW[xn+3],color:((mT==ASM) ? LMX_M2OUT : LMX_M1OUT)};
 } else if (dOK[CCW[xn+5]]) {return {cell:CCW[xn+5]};} else if (view[CCW[xn+5]].ant&&view[CCW[xn+5]].ant.friend&&
 dOK[CCW[xn+6]]) {return {cell:CCW[xn+6]};} else {return NOP;}} else if (spcMS()) {return (rLASSy());}return (rLostMSy(false));}function rLDSSy() {var ptrn=PTGRR1;var msm=patC(ptrn,AIMU,1,1);if (xn>=0) {if ((view[CCW[xn]].color==LMR0)&&
 (view[CCW[xn+1]].color==LCLR)) {
-if ((view[CCW[xn+2]].color==LMX_M3OUT)&&
+if ((mC==LRR1X)&&(view[CCW[xn+2]].color!=LMX_M3OUT)) {
+return {cell:CCW[xn+2],color:LMX_M3OUT};
+}if ((view[CCW[xn+2]].color==LMX_M3OUT)&&
 (mC!=LRR1X)) {return {cell:POSC,color:LRR1X};
 } else if ((LCRMX_OUT[view[CCW[xn+2]].color])&&
 (mC!=LRR1V)) {return {cell:POSC,color:LRR1V};
@@ -203,7 +204,10 @@ dOK[CCW[xn+3]]) {return {cell:CCW[xn+3]};}}if ((mC==LRM1)&&(view[CCW[xn+3]].colo
 (view[CCW[xn+3]].color!=LRR1U)) {
 if ((((mT==AJM)&&(view[CCW[xn+3]].color==LRR1))||
 ((mT==ASM)&&(view[CCW[xn+3]].color==LRR1V)))&&
-dOK[CCW[xn+3]]) {return {cell:CCW[xn+3]};}}var c=CCW[xn+5];if (dOK[c]) {return {cell:c};} else if (view[c].ant&&view[c].ant.friend) {
+dOK[CCW[xn+3]]) {return {cell:CCW[xn+3]};}}if (mC==LRM0&&(view[CCW[xn+5]].color==LRM1_WRP)&&
+!(view[CCW[xn+5]].ant&&view[CCW[xn+5]].ant.friend)) {
+return {cell:CCW[xn+5],color:LRM1};
+}var c=CCW[xn+5];if (dOK[c]) {return {cell:c};} else if (view[c].ant&&view[c].ant.friend) {
 var evade=false;if (view[c].ant.food>0) {evade=true;} else if (view[CCW[xn+1]].ant&&
 view[CCW[xn+1]].ant.friend&&(view[CCW[xn+1]].ant.food==0)) {
 evade=true;}if (evade) {if (dOK[CCW[xn+4]]) {return {cell:CCW[xn+4]};} else if (dOK[CCW[xn+3]]) {return {cell:CCW[xn+3]};} else {return NOP;}} else {return NOP;}}} else if (msm<0) {var cc=fwdWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
@@ -244,7 +248,7 @@ if ((xn<0)&&(eT>0)) {ptrn=PTGRM0;msm=patC(ptrn,AIMD,3,2);}if ((xn<0)&&(eT>0)) {p
 if ((xn<0)&&(eT>0)) {ptrn=PTGRM2B;msm=patC(ptrn,AIMD,3,2);}if ((xn<0)&&(eT>0)) {ptrn=PTGRM0;msm=patC(ptrn,AIMD,3,2);}} else if (mC==LRM1_WRP) {ptrn=PTGRM1;msm=patC(ptrn,AIMD,3,2);if (xn>=0) {if (view[CCW[xn+3]].color!=LRR1X) {
 return {cell:CCW[xn+3],color:LRR1X};
 } else if (!(view[CCW[xn+7]].ant&&
-view[CCW[xn+7]].ant.friend)) {return {cell:POSC,color:LRM1};}}}if (xn<0) {return (rLostMSy(false));}if (msm==0) {var c=CCW[xn+1];if (dOK[c]) {return {cell:c};} else if (view[c].ant&&view[c].ant.friend) {
+view[CCW[xn+7]].ant.friend)) {return {cell:POSC,color:LRM1};}}}if (xn<0) {if (spcRR1()) {return (rLDSSy());}return (rLostMSy(false));}if (msm==0) {var c=CCW[xn+1];if (dOK[c]) {return {cell:c};} else if (view[c].ant&&view[c].ant.friend) {
 var evade=false;if (view[c].ant.food==0) {evade=true;} else if (view[CCW[xn+5]].ant&&
 view[CCW[xn+5]].ant.friend&&(view[CCW[xn+5]].ant.food>0)) {
 evade=true;}if (evade) {if (dOK[CCW[xn]]) {return {cell:CCW[xn]};} else if (dOK[CCW[xn+7]]) {return {cell:CCW[xn+7]};} else {return NOP;}} else {return NOP;}}} else if (msm<0) {var cc=fwdWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
