@@ -4,6 +4,7 @@
 0002 UMs at rail head confused by black cell ahead
 0011 Food right at the shaft head can get the miner confused and stuck
 0012 Confused LM when departing from wrapped shaft
+0013 Update ASCII-art comment to reflect fix for #7
 
 ### Enhancements:
 0007 Use the first possible shaft off rail1, too
