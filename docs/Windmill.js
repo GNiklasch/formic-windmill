@@ -945,7 +945,8 @@ function runLMStrategies () {
     } else if (specLikeMS0ROut()) {
 	debugme("Laden Miner: spectrum resembles MS0ROut");
 	return (runLMLeavingVacantShaftStrategy());
-    } else if (specLikeCenterShaft()) {
+    } else if (specLikeCenterShaft() &&
+	       (adjFriends[ANT_ENGINEER] == 0)) {
 	debugme("Laden Miner: spectrum resembles mine shaft");
 	return (runLMAscendingShaftStrategy());
     } else if (specLikeRL02()) {
@@ -2193,11 +2194,28 @@ function runLMTravelOrRepairRailStrategy() {
 
 function runLMFixingRailStrategy() {
     // Assert:  Engineer in view, but rail no longer recognizable
-    // by its spectrum.  Try to do something about it?  or wait for
-    // a SAR team to turn up from home?
-    // #future#
+    // by its spectrum.  By our maxim not to imagine things that
+    // aren't there, our best bet is to wait for a SAR team to turn
+    // up from home and patch up the rail.  But there is one thing
+    // we can usefully do and which may save the day if we've just
+    // returned from the first shaft off a rail to find our hub
+    // ravaged and overpainted by an adversary:  If we see the
+    // engineer on a lateral neighbor cell, step clockwise to have
+    // her in diagonal view instead.  In that particular scenario
+    // this would take us from RM1 to RM0 and put us next to the
+    // queen, so we can deliver our food and turn around to repair
+    // the rail ourselves.
     debugme("LMFixingRailStrategy...");
-    return CELL_NOP; // placeholder
+    for (var i = 1; i < TOTAL_NBRS; i+=2) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    (view[CCW[i]].ant.type == ANT_ENGINEER) &&
+	    destOK[CCW[i+2]]) {
+	    return {cell:CCW[i+2]};
+	}
+    }
+    // Otherwise, do wait for someone who knows where she is to put
+    // ourselves and the engineer back on track.
+    return CELL_NOP;
 }
 
 function runLMReachingHomeStrategy() {
