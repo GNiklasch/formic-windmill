@@ -53,9 +53,8 @@ view[CCW[xn+4]].ant&&view[CCW[xn+4]].ant.friend)) {
 return {cell:CCW[xn+5],type:AJM};
 } else if ((i==7)&&dOK[CCW[xn+5]]&&!(view[CCW[xn+6]].ant&&view[CCW[xn+6]].ant.friend)) {
 return {cell:CCW[xn+5],type:AJM};
-}}}} else if (view[CCW[xn]].ant.food>0) {
-if ((mF>0)&&(view[CCW[xn+7]].color==LA)&&dOK[CCW[xn+7]]) {return {cell:CCW[xn+7],type:AJM};
-}} else if (view[CCW[xn+1]].ant.food>0) {
+}}}} else if ((mF>0)&&(view[CCW[xn+7]].color==LA)&&dOK[CCW[xn+7]]) {return {cell:CCW[xn+7],type:AJM};
+} else if (view[CCW[xn+1]].ant.food>0) {
 if ((mF>0)&&dOK[CCW[xn+2]]) {return {cell:CCW[xn+2],type:AJM};
 }} else if ((aLF[AJM]+aLF[ASM]>0)&&
 (mF>0)&&(sN[LA]>0)) {for (var i=2; i<TN; i++) {var c=CCW[xn+i];if (dOK[c]&&(view[c].color==LA)) {
@@ -286,4 +285,4 @@ totDscs+=wt;}}if ((xn<0)&&(totDscs>qG)) {return PTNOM;}}if ((xn<0)) {xn=ortn;}if
 }function isSc1(color) {return (LCRSCVAL[color]&&(LCRSC_VALUE[color]==1));
 }function incSc(color) {if (LCRSCVAL[color]) {return (LCRSC[(LCRSC_VALUE[color]+1) % SCPERD]);
 } else {return undefined;}}function spcMS() {return (((mC==LCLR)||((mF+fdL>0)&&(mC==LMMF))||((mF>0)&&(mC==LMMH)))&&(sN[LMR0]+sN[LML1] +sN[LMR2]+sN[LML3]>=2)&&(sN[LCLR]>=3)&&(sN[LMMF] +sN[LMMH] +sN[PB]<=3)); }function spcRM() {return (LCRGRM_ALL[mC]&&(sT[LRL0]+sT[LRL1]>=3)&&(sN[LRL0]>=1)&&(sN[LRR0]+sN[LRR2]>=2)&&(sT[LRM0]+sT[LRM1_WRP] +sT[LRM1]+sT[LRM2]>=2)&&(sT[LCLR]<=4));}function spcRL1() {return ((mC==LRL1)&&(sL[LRL0]>=2)&&(sD[LRM0]>=1)&&(sL[LRM1_WRP]+sL[LRM1]>=1)&&(sD[LRM2]>=1));}function spcRL02() {return ((mC==LRL0)&&(sL[LRL1]+sL[LRL2]>=2)&&(sN[LRM0]>=1)&&(sD[LRM1_WRP]+sD[LRM1]>=1));}function spcRR0() {return ((mC==LRR0)&&(sL[LRM1]==0)&&(sD[LRM1]+sD[LRM1_WRP]>=1)&&(sL[LMR0]>=1)&&(sL[LRR2]>=1));}function spcRR1() {return (LCRGRR1[mC]&&(sN[LRR0]>=2)&&(sL[LRR2]>=1)&&(sD[LRM0]>=1)&&(sN[LCLR]<=3)&&(sL[LRM1] +sL[LRM1_WRP]>=1));}function spcRR2() {return ((mC==LRR2)&&(sD[LCLR]>=1)&&(sD[LRM0]>=1)&&(sD[LRM1]+sD[LMR0]>=2)&&(sL[LRR0]>=2));}function spcMS0R() {return((mC==LCLR)&&(sL[LMR0]>=1)&&(sL[LRR1U]>=1)&&
-(sD[LRR2]>=1)&&(sD[LRR0]>=1));}function spcMS0ROut() {return ((mC==LCLR)&&(sL[LMR0]+sL[LRR1V]>=2)&&(sD[LRR2]>=2)&&(sD[LRR0]>=1));}function spcMS0W() {return ((mC==LCLR)&&(sD[LRL0]>=3)&&(sL[LRL1]>=1)&&(sL[LMS_WRP]>=2)&&(sN[LCLR]>=2));}function spcMFL() {return ((sL[LMMF]>=1)&&(sD[LMMH]>=1)&&(sT[LCLR]>=2)&&(sT[LML1]+sT[LML3]>=1));}function spcMFR() {return ((sL[LMMF]>=1)&&(sD[LMMH]>=1)&&(sT[LCLR]>=2)&&(sT[LMR0]+sT[LMR2]>=1));}function fixup(ptrnCell) {if (Array.isArray(ptrnCell)) {for (var i=1; i<=9; i++) {if (ptrnCell[i]) {return i;}}return LCLR;} else {return ptrnCell;}}function debugme(arg) {if (DEBUGME[mT]) {console.log(arg);}}
+(sD[LRR2]>=1)&&(sD[LRR0]>=1));}function spcMS0ROut() {return ((mC==LCLR)&&(sL[LMR0]+sL[LRR1V]>=2)&&(sD[LRR2]>=2)&&(sD[LRR0]>=1));}function spcMS0W() {return ((mC==LCLR)&&(sD[LRL0]>=3)&&(sL[LRL1]>=1)&&(sL[LMS_WRP]>=2)&&(sN[LCLR]>=2));}function spcMFL() {return ((sL[LMMF]>=1)&&(sD[LMMH]>=1)&&(sT[LCLR]>=2)&&(sT[LML1]+sT[LML3]>=1));}function spcMFR() {return ((sL[LMMF]>=1)&&(sD[LMMH]>=1)&&(sT[LCLR]>=2)&&(sT[LMR0]+sT[LMR2]>=1));}function fixup(ptrnCell) {if (Array.isArray(ptrnCell)) {for (var i=1; i<=9; i++) {if (ptrnCell[i]) {return i;}}return LCLR;} else {return ptrnCell;}}

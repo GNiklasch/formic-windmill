@@ -1155,17 +1155,34 @@ function runQueenOperatingMineStrategy() {
 	// Otherwise, fall through to normal operations.  Either there
 	// are already defenders in place, or there's no unoccupied cell
 	// to do anything about the intruder(s).
-    } else if (view[CCW[compass]].ant.food > 0) {
-	// A food-bearing enemy queen has appeared next to our gardener.
-	if ((myFood > 0) &&
-	    (view[CCW[compass+7]].color == LCL_ALERT) &&
-	    destOK[CCW[compass+7]]) {
-	    // The gardener has spotted the intruder queen on a cell we can't
-	    // see directly, but visible from the alert-colored cell.
-	    // Put a miner there.
-	    debugme("Enemy queen beyond our own view reported by the gardener.");
-	    return {cell:CCW[compass+7], type:ANT_JUNIOR_MINER};
-	}
+    } else if ((myFood > 0) &&
+	       (view[CCW[compass+7]].color == LCL_ALERT) &&
+	       destOK[CCW[compass+7]]) {
+	// We normally never use this color on an RL0 cell, and the gardener
+	// would only plant violets to tell us that she can see a queen whom
+	// we can't see directly.  Note that when the enemy has only just
+	// stepped up, the gardener would typically *not* appear laden:  She
+	// would have received one food at the end of the enemy queen's move,
+	// and would have delivered it at the end of her own move, before it
+	// is our  (the Windmill queen's)  turn.
+	// Note that runGardenerGardeningTactic() would normally ensure that
+	// RL0 has its usual color when *no* enemy queen is in view  (as long
+	// as the gardener isn't preoccupied with other things).  Thus a single
+	// enemy worker on RL1, say, can't trick us into spawning an unlimited
+	// number of defenders by overpainting RL0.
+	debugme("Enemy queen beyond our own view reported by the gardener.");
+	// About the first thing the defender will do is restore the RL0 cell
+	// color.  And the gardener won't use the alert color again until the
+	// cell becomes empty.  This puts a limit on the rate at which this
+	// mechanism can get triggered.
+	// #future# Alternatively, what about an extra Engineer as a
+	// defender.....?  (That would depend on teaching an Engineer
+	// at home to pay attention to unfriendly ants in her view.)
+	// On the other hand, when we find ourselves having to expend food
+	// for a defender:  While an extra engineer might later help to keep
+	// a damaged rail right-side up, extra miners could proceed to gather
+	// food when their patrol service is over.
+	return {cell:CCW[compass+7], type:ANT_JUNIOR_MINER};
     } else if (view[CCW[compass+1]].ant.food > 0) {
 	// A food-bearing enemy queen has appeared next to our secretary,
 	// but neither the gardener nor myself can see her directly.
@@ -1341,7 +1358,7 @@ function runGardenerOperatingStrategy() {
 	    !view[CCW[compass+1]].ant) {
 	    return {cell:CCW[compass+1], color:LCL_ALERT};
 	}
-	c = CCW[compass+3]; // our G6 garden cell
+	c = CCW[compass+3]; // our G3 garden cell
 	if (view[c].ant && !view[c].ant.friend &&
 	    (view[c].ant.type == ANT_QUEEN) &&
 	    (view[c].ant.food > 0) &&

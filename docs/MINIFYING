@@ -4,12 +4,14 @@ To get from Windmill.js to Windmill-golfed.js:
 block comments,
 
 (2) manually remove or comment out the one debugme() call which spans
-multiple lines  (in the function runDefenderStrategies()),
+multiple lines  (in the function runDefenderStrategies())  and the
+definition of the function  (near the end),
 
 (3) manually remove or comment out the explicit console.log() calls
 conditioned on DEBUG_PATTERN_CHECK_VERBOSELY  (in the pattern engine
-functions near the end of the file)  and the definition of this variable
-(near the beginning),
+functions near the end of the file, including the conditional on DEBUGME
+around two of them)  and the definition of this variable  (near the
+beginning),
 
 (4) save the result to an intermediate file,
 

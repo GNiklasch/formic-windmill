@@ -1,5 +1,8 @@
 ## In work
 
+### Bugfixes:
+0017 Flawed defender logic in runQueenOperatingMineStrategy()
+
 ### Enhancements:
 0015 LM meeting the engineer on a damaged rail can do more than just stop
 
