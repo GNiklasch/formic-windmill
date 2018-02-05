@@ -817,14 +817,14 @@ function runQueenStrategies () {
 }
 
 function runSecStrategies () {
-    // Assert: compass is set, queen and myself mutually at CCW[compass+1]
+    // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
     // (facing in opposite directions);  gardener (not checked) had better
     // be at CCW[compass+3].  For now there's only one strategy.
     return (runSecOperatingStrategy());
 }
 
 function runGardenerStrategies () {
-    // Assert: compass is set, queen and myself mutually at CCW[compass]
+    // Assert:  compass is set, queen and myself mutually at CCW[compass]
     // (facing in different directions), the secretary will be created at
     // my CCW[compass+7].
     var secCell = view[CCW[compass+7]];
@@ -842,7 +842,7 @@ function runEngineerStrategies () {
     // to be handled before checking for nearby miners  (and we could and
     // should even set our compass in that case).
     if (adjFriends[ANT_QUEEN] > 0) {
-	// Assert: compass is set.
+	// Assert:  compass is set.
 	return (runEngineerAtHomeStrategy());
     } else if (adjFriends[ANT_JUNIOR_MINER] +
 	       adjFriends[ANT_SENIOR_MINER] > 0) {
@@ -871,7 +871,7 @@ function runUMStrategies () {
 	 adjFriends[ANT_ENGINEER] >= 3)) {
 	return (runUMCongestionResolutionStrategy());
     } else if (adjFriends[ANT_QUEEN] > 0) {
-	// Assert: compass is set.
+	// Assert:  compass is set.
 	return (runUMAtHomeStrategy());
     } else if (adjFriends[ANT_STAFF] > 0) { // probably the gardener
 	debugme("Unladen Miner: staff in view");
@@ -1036,7 +1036,7 @@ function runQueenScramblingStrategy() {
  * a rail, work around them, and pray.
  */
 function runQueenSettlingStrategy() {
-    // Assert: compass is set, gardener and self mutually at CCW[compass]
+    // Assert:  compass is set, gardener and self mutually at CCW[compass]
     // (facing in different directions).  Phase ends with the secretary at
     // our CCW[compass+1] and the clock not yet running.
     if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET) &&
@@ -1100,7 +1100,7 @@ function runQueenSettlingStrategy() {
  */
 
 function runQueenOperatingMineStrategy() {
-    // Assert: compass is set, secretary and self mutually at CCW[compass+1]
+    // Assert:  compass is set, secretary and self mutually at CCW[compass+1]
     // (facing in opposite directions), gardener at CCW[compass].
     if ((adjFoes[ANT_QUEEN] > 0) && (myFood > 0)) {
 	// Emergency...  Forget about our clock for a moment.
@@ -1256,7 +1256,7 @@ function runQueenOperatingMineStrategy() {
 	    if (!destOK[CCW[compass+destination]]) {
 		return (runQueenHousekeepingTactic()); // too crowded
 	    }
-	    // Assert: destOK[CCW[compass+destination]]
+	    // Assert:  destOK[CCW[compass+destination]]
 	    if (myFood <= THRESHOLD3) {
 		if (compass <= 2) {
 		    return {cell:CCW[compass+destination], type:ANT_JUNIOR_MINER};
@@ -1293,7 +1293,7 @@ function runQueenOperatingMineStrategy() {
 }
 
 function runQueenLeavingStrategy() {
-    // Assert: compass is set, gardener at CCW[compass].
+    // Assert:  compass is set, gardener at CCW[compass].
     // Placeholder function;  contemplated but not yet used.
     return CELL_NOP; // placeholder
 }
@@ -1306,7 +1306,7 @@ function runQueenConfusedStrategy() {
 // Secretary's strategies
 
 function runSecOperatingStrategy() {
-    // Assert: compass is set, queen and myself mutually at CCW[compass+1]
+    // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
     // (facing in opposite directions);  gardener (not checked) had better
     // be at my CCW[compass+3]
     // If our clock is not yet running, start it.  (Not at zero since we
@@ -1326,7 +1326,7 @@ function runSecOperatingStrategy() {
 // Gardener's strategies
 
 function runGardenerSettlingStrategy() {
-    // Assert: compass is set, queen and myself mutually at CCW[compass]
+    // Assert:  compass is set, queen and myself mutually at CCW[compass]
     // (facing in different directions), secretary yet to be created.
     // Our prime responsibility here is to keep the queen's cell white
     // (normally a no-op!):
@@ -1342,7 +1342,7 @@ function runGardenerSettlingStrategy() {
 }
 
 function runGardenerOperatingStrategy() {
-    // Assert: compass is set, queen and myself mutually at CCW[compass]
+    // Assert:  compass is set, queen and myself mutually at CCW[compass]
     // (facing in different directions), secretary at my CCW[compass+7].
     if (adjFoes[ANT_QUEEN] > 0) {
 	// Defending our home:  Is the enemy queen somewhere that we can
@@ -1405,7 +1405,7 @@ function runLostStaffStrategy() {
 // Engineers' strategies
 
 function runEngineerAtHomeStrategy() {
-    // Assert: compass is set.
+    // Assert:  compass is set.
     // Don't move until queen's clock counter has turned valid, but may
     // paint ahead.
     // We start out on the left rail edge with the queen straight behind
@@ -1459,7 +1459,7 @@ function runEngineerAloneStrategy() {
 // Unladen Miners' strategies
 
 function runUMAtHomeStrategy() {
-    // Assert: compass is set.
+    // Assert:  compass is set.
     // Don't move until queen's clock counter has turned valid, but may
     // paint ahead.
     // We start out in the middle of the rail with the queen diagonally
@@ -1556,7 +1556,7 @@ function runUMBuildingRailStrategy() {
 }
 
 function runUMTravelOrRepairRailStrategy() {
-    // Assert: specLikeCenterRail, engineer is not in view
+    // Assert:  specLikeCenterRail, engineer is not in view
     debugme("Unladen Miner sans Engineer: spectrum resembles RM");
     return (runUMCenterRailTactic());
 }
@@ -2488,7 +2488,7 @@ function runQueenScramblingEatingTactic() {
 }
 
 function runQueenScramblingSnatchingTactic() {
-    // Assert: Food in view, and one or more enemy queens in view and
+    // Assert:  Food in view, and one or more enemy queens in view and
     // no enemy workers.  Still need to orient ourselves.
     // Don't wait to paint our current cell -- just grab the food.
     // (The destOK check is paranoia;  if the cell contained food
@@ -2503,7 +2503,7 @@ function runQueenScramblingSnatchingTactic() {
 }
 
 function runQueenScramblingTrailCheckTactic() {
-    // Assert: unobstructed; myColor != LCL_TRAIL
+    // Assert:  unobstructed; myColor != LCL_TRAIL
     // Still need to orient ourselves.
     if ((myColor != LCL_CLEAR) && (specNbrs[myColor] >= 4)) {
 	debugme("Queen:  Yuck!");
@@ -2680,7 +2680,7 @@ function runQueenScramblingEvasionTactic() {
 }
 
 function runQueenHousekeepingTactic() {
-    // Assert: compass is set, secretary and self mutually at CCW[compass+1]
+    // Assert:  compass is set, secretary and self mutually at CCW[compass+1]
     // (facing in opposite directions), gardener at CCW[compass];  the clock
     // has rung but we aren't using our turn to create a new worker -- so
     // use it instead to make sure our immediate surroundings are in order.
@@ -3192,7 +3192,7 @@ function runLMWrappingOntoRailTactic(pattern, mismatch) {
 }
 
 function runLMAscendingShaftTactic(pattern, mismatch) {
-    // Assert: compass is set, a suitable pattern has matched.
+    // Assert:  compass is set, a suitable pattern has matched.
     // Any food on the walls would already have been grabbed.
     debugme("LMAscendingShaftTactic...");
     var c = CCW[compass+5];
