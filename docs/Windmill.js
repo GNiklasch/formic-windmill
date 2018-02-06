@@ -818,9 +818,15 @@ function runQueenStrategies () {
 
 function runSecStrategies () {
     // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
-    // (facing in opposite directions);  gardener (not checked) had better
-    // be at CCW[compass+3].  For now there's only one strategy.
-    return (runSecOperatingStrategy());
+    // (facing in opposite directions).  Normally the gardener will be
+    // at CCW[compass+3].
+    if (view[CCW[compass+3]].ant &&
+	view[CCW[compass+3]].ant.friend &&
+	(view[CCW[compass+3]].ant.type == ANT_STAFF)) {
+	return (runSecOperatingStrategy());
+    } else {
+	return (runSecEmergencyStrategy());
+    }
 }
 
 function runGardenerStrategies () {
@@ -1214,6 +1220,17 @@ function runQueenOperatingMineStrategy() {
 	    }
 	}
 	// Otherwise, fall through and get on with business as best we can.
+    } else if ((foesTotal > 0) &&
+	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
+	       (myFood > THRESHOLD3)) {
+	debugme("Thieves in our hall.");
+	// Step to RM0 of rail1 if possible, keeping the secretary
+	// in our lateral view and vice versa.
+	if (destOK[CCW[compass+2]]) {
+	    debugme("Going unhinged...");
+	    return {cell:CCW[compass+2]};
+	}
+	// Otherwise, fall through and get on with business as best we can.
     }
     if (!(LCR_QC_VALID[myColor])) {
 	// (Re)start our clock.  (Not at zero since we don't want it to
@@ -1293,8 +1310,12 @@ function runQueenOperatingMineStrategy() {
 }
 
 function runQueenLeavingStrategy() {
-    // Assert:  compass is set, gardener at CCW[compass].
-    // Placeholder function;  contemplated but not yet used.
+    // Assert:  compass is set, secretary at CCW[compass+1].
+    debugme("Yukon ho!");
+    // #### TODO
+    if (destOK[CCW[compass+2]]) {
+	return {cell:CCW[compass+2]};
+    }
     return CELL_NOP; // placeholder
 }
 
@@ -1307,8 +1328,7 @@ function runQueenConfusedStrategy() {
 
 function runSecOperatingStrategy() {
     // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
-    // (facing in opposite directions);  gardener (not checked) had better
-    // be at my CCW[compass+3]
+    // (facing in opposite directions);  gardener at my CCW[compass+3].
     // If our clock is not yet running, start it.  (Not at zero since we
     // don't want it to ring immediately.)
     if (!(LCR_SC_VALID[myColor])) {
@@ -1321,6 +1341,22 @@ function runSecOperatingStrategy() {
 	return {cell:POS_CENTER, color:incrementSc(myColor)};
     }
     return CELL_NOP; // notreached
+}
+
+function runSecEmergencyStrategy() {
+    // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
+    // (facing in opposite directions);  *no* gardener at CCW[compass+3].
+    debugme("Escorting the departing queen.");
+    if (view[CCW[compass+5]].ant &&
+	view[CCW[compass+5]].ant.friend &&
+	(view[CCW[compass+5]].ant.type == ANT_STAFF)) {
+	debugme("First step");
+	if (destOK[CCW[compass]]) {
+	    return {cell:CCW[compass]};
+	}
+    }
+    // ####TODO####
+    return CELL_NOP; // placeholder
 }
 
 // Gardener's strategies
