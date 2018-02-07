@@ -1222,7 +1222,7 @@ function runQueenOperatingMineStrategy() {
 	// Otherwise, fall through and get on with business as best we can.
     } else if ((foesTotal > 0) &&
 	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
-	       (myFood > THRESHOLD3)) {
+	       (myFood > THRESHOLD2)) {
 	debugme("Thieves in our hall.");
 	// Step to RM0 of rail1 if possible, keeping the secretary
 	// in our lateral view and vice versa.
