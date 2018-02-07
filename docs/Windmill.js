@@ -788,8 +788,6 @@ function runQueenStrategies () {
 	    if (cell.ant && cell.ant.type == ANT_STAFF) {
 		compass = i & 6;
 		if (i & 1) { // found (only) the secretary
-		    // #future#  At present, we *never* leave once we
-		    // have settled.
 		    return (runQueenLeavingStrategy());
 		} else { // found (only) the gardener
 		    return (runQueenSettlingStrategy());
@@ -1312,11 +1310,15 @@ function runQueenOperatingMineStrategy() {
 function runQueenLeavingStrategy() {
     // Assert:  compass is set, secretary at CCW[compass+1].
     debugme("Yukon ho!");
-    // #### TODO
+    // We trust the secretary's navigation abilities.  If the secretary's
+    // way on is blocked, we end up going around her and ultimately
+    // toppling over  (if the gardener should come into our view again
+    // from a funny angle).  But then we'll still receive some food and
+    // some miners will still be able to turn around and depart...
     if (destOK[CCW[compass+2]]) {
 	return {cell:CCW[compass+2]};
     }
-    return CELL_NOP; // placeholder
+    return CELL_NOP;
 }
 
 function runQueenConfusedStrategy() {
@@ -1451,8 +1453,14 @@ function runGardenerOperatingStrategy() {
 // Emergency staff strategy
 
 function runLostStaffStrategy() {
-    // Does not happen as long as the queen stays where she is once settled.
-    return CELL_NOP; // placeholder
+    // Tell our friends that we're lost.
+    if (myColor != LCL_CLEAR) {
+	return {cell:POS_CENTER, color:LCL_CLEAR};
+    } else if (view[CCW[0]].color == LCL_G6) {
+	// remove a potential obstacle that might confuse lost LMs
+	return {cell:CCW[0], color:LCL_CLEAR};
+    }
+    return CELL_NOP;
 }
 
 // Engineers' strategies
@@ -1957,7 +1965,10 @@ function runUMReachingHomeStrategy() {
     for (var i = 0; i < TOTAL_NBRS; i++) {
 	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
 	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (destOK[CCW[i+1]]) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
 		return {cell:CCW[i+1]};
 	    }
 	}
@@ -2303,7 +2314,10 @@ function runLMReachingHomeStrategy() {
     for (var i = 0; i < TOTAL_NBRS; i++) {
 	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
 	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (destOK[CCW[i+1]]) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
 		return {cell:CCW[i+1]};
 	    }
 	}
