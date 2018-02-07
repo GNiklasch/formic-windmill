@@ -1346,6 +1346,10 @@ function runSecOperatingStrategy() {
 function runSecEmergencyStrategy() {
     // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
     // (facing in opposite directions);  *no* gardener at CCW[compass+3].
+    // Our strategy is quick and dirty, trusting that most colors are still
+    // as they should be near home, without over-matching.  Any obstacle
+    // along our path will result in the windmill toppling over in some
+    // uncontrolled fashion.  (Can't win them all...)
     debugme("Escorting the departing queen.");
     if (view[CCW[compass+5]].ant &&
 	view[CCW[compass+5]].ant.friend &&
@@ -1354,9 +1358,22 @@ function runSecEmergencyStrategy() {
 	if (destOK[CCW[compass]]) {
 	    return {cell:CCW[compass]};
 	}
+    } else if ((myColor == LCL_RR0) &&
+	       (view[CCW[compass+5]].color == LCL_G6)) {
+	debugme("Second step");
+	if (destOK[CCW[compass]]) {
+	    return {cell:CCW[compass]};
+	}
+    } else {
+	debugme("Third step");
+	if (destOK[CCW[compass+3]]) {
+	    debugme("Taking up gardening.");
+	    return {cell:CCW[compass+3]};
+	    // This should result in persuading the queen to settle anew.
+	}
     }
-    // ####TODO####
-    return CELL_NOP; // placeholder
+    // Otherwise, stay put.
+    return CELL_NOP;
 }
 
 // Gardener's strategies
