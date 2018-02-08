@@ -39,6 +39,11 @@ var THRESHOLD2 = 17; // throttle back the spawning of junior miners
 var THRESHOLD3 = 67; // start creating senior miners
 var THRESHOLD4 = 120; // stop creating junior miners
 var THRESHOLD5 = 390; // stop spawning altogether
+// Threshold for evasion/resettling when under attack:
+// We'll only want to do this when we have enough food already to create
+// a new hub, and when losing all the food we have would lose a lot of
+// score points.  (We won't do it when we've had a bad start anyway.)
+var THRESHOLDX = 15;
 
 // We lock in queen's hoarded food  (don't expend it on new workers,
 // except in dire emergencies)  when the current amount modulo
@@ -1220,7 +1225,7 @@ function runQueenOperatingMineStrategy() {
 	// Otherwise, fall through and get on with business as best we can.
     } else if ((foesTotal > 0) &&
 	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
-	       (myFood > THRESHOLD2)) {
+	       (myFood > THRESHOLDX)) {
 	debugme("Thieves in our hall.");
 	// Step to RM0 of rail1 if possible, keeping the secretary
 	// in our lateral view and vice versa.
