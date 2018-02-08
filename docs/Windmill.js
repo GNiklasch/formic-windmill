@@ -1461,9 +1461,6 @@ function runLostStaffStrategy() {
     // Tell our friends that we're lost.
     if (myColor != LCL_CLEAR) {
 	return {cell:POS_CENTER, color:LCL_CLEAR};
-    } else if (view[CCW[0]].color == LCL_G6) {
-	// remove a potential obstacle that might confuse lost LMs
-	return {cell:CCW[0], color:LCL_CLEAR};
     }
     return CELL_NOP;
 }
