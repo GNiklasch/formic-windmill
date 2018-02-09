@@ -1381,9 +1381,16 @@ function runSecEmergencyStrategy() {
 	    debugme("Taking up gardening.");
 	    return {cell:CCW[compass+3]};
 	    // This should result in persuading the queen to settle anew.
+	} else if (destOK[CCW[compass]]) {
+	    debugme("No garden soil here, going further.");
+	    // More than three steps mean we'll lose the fortuitous
+	    // alignment between old and new rails if we resettle later.
+	    return {cell:CCW[compass]};
 	}
     }
-    // Otherwise, stay put.
+    // Otherwise, stay put.  The queen would step around us if possible,
+    // so the next time it's our turn we would try to do things at a
+    // new angle.
     return CELL_NOP;
 }
 
