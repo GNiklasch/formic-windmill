@@ -1032,9 +1032,9 @@ function runQueenScramblingStrategy() {
 /*
  * The queen is settling down and creating the initial team of workers:
  *
- * The gardener will kick everything off by setting her cell to
- * LCL_PHASE_BOOTING, and ensures that the queen's myColor is LCL_QC_RESET
- * (a synonym of LCL_CLEAR).  Since the gardener, being the oldest worker,
+ * The gardener will ensure that the queen's myColor is LCL_QC_RESET
+ * (a synonym of LCL_CLEAR)  and then kick everything off by setting her
+ * cell to LCL_PHASE_BOOTING.  Since the gardener, being the oldest worker,
  * moves first, then all the younger workers, and then the queen, we can
  * rely on the engineers and miners  (who can see the queen's cell's color)
  * to stay in view until we've created all of them and the secretary, in
@@ -1048,27 +1048,31 @@ function runQueenSettlingStrategy() {
     // Assert:  compass is set, gardener and self mutually at CCW[compass]
     // (facing in different directions).  Phase ends with the secretary at
     // our CCW[compass+1] and the clock not yet running.
-    if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET) &&
-	(view[CCW[compass]].color == LCL_PHASE_BOOTING)) {
-	if (destOK[CCW[compass+3]]) {
-	    return { cell:CCW[compass+3], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+5]]) {
-	    return { cell:CCW[compass+5], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+7]]) {
+    // When resettling after an emergency, we gain one tempo by creating
+    // the rail3 engineer  (on the side where we know an enemy to be near)
+    // one turn before the gardener sets her cell to LCL_PHASE_BOOTING.
+    if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET)) {
+	if (destOK[CCW[compass+7]]) {
 	    return { cell:CCW[compass+7], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+2]]) {
-	    return { cell:CCW[compass+2], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+4]]) {
-	    return { cell:CCW[compass+4], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+6]]) {
-	    return { cell:CCW[compass+6], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+1]]) {
-	    // finally, the secretary
-	    return { cell:CCW[compass+1], type:ANT_STAFF};
+	} else if (view[CCW[compass]].color == LCL_PHASE_BOOTING) {
+	    if (destOK[CCW[compass+3]]) {
+		return { cell:CCW[compass+3], type:ANT_ENGINEER};
+	    } else if (destOK[CCW[compass+5]]) {
+		return { cell:CCW[compass+5], type:ANT_ENGINEER};
+	    } else if (destOK[CCW[compass+6]]) {
+		return { cell:CCW[compass+6], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+2]]) {
+		return { cell:CCW[compass+2], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+4]]) {
+		return { cell:CCW[compass+4], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+1]]) {
+		// finally, the secretary
+		return { cell:CCW[compass+1], type:ANT_STAFF};
+	    }
 	}
+	// Assert:  still holding >= THRESHOLD0 food
     }
-    // assert: still holding >= THRESHOLD0 food
-    return CELL_NOP; // wait for the gardener to fix the colors
+    return CELL_NOP; // not normally reached
 }
 
 /*
