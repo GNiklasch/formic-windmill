@@ -4,6 +4,7 @@
 0017 Flawed defender logic in runQueenOperatingMineStrategy()
 
 ### Enhancements:
+0008 Deal with both staff in a miner's view
 0015 LM meeting the engineer on a damaged rail can do more than just stop
 0016 Review our defensive options against Vampire Mk.V (Quixotic)
 

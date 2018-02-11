@@ -82,7 +82,6 @@ while (<>) {
     s/runQueenStrategies/rQSs/g;
     s/runSecStrategies/rSSs/g;
     s/runGardenerStrategies/rGSs/g;
-    s/runLostStaffStrategy/rLSSs/g;
     s/runEngineerStrategies/rESs/g;
     s/runDefenderStrategies/rDSs/g;
     s/runLMStrategies/rLSs/g;
@@ -97,6 +96,7 @@ while (<>) {
     s/runSecEmergencyStrategy/rSESy/g;
     s/runGardenerOperatingStrategy/rGOSy/g;
     s/runGardenerSettlingStrategy/rGSSy/g;
+    s/runLostStaffStrategy/rLSSy/g;
     s/runEngineerAtHomeStrategy/rEHyS/g;
     s/runEngineerBuildingRailStrategy/rEBRSy/g;
     s/runEngineerAloneStrategy/rEASy/g;
@@ -115,6 +115,7 @@ while (<>) {
     s/runUMEnteringShaftStrategy/rUESSy/g;
     s/runUMShaftWrappingStrategy/rUSWSy/g;
     s/runLostMinerStrategy/rLostMSy/g;
+    s/runMinerToRail1Strategy/rM2R1Sy/g;
     s/runLMCongestionResolutionStrategy/rLCRSy/g;
     s/runLMReachingHomeStrategy/rLRHSy/g;
     s/runLMLeavingLeftWallStrategy/rLLLWSy/g;

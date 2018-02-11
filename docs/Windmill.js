@@ -884,7 +884,11 @@ function runUMStrategies () {
 	return (runUMAtHomeStrategy());
     } else if (adjFriends[ANT_STAFF] > 0) { // probably the gardener
 	debugme("Unladen Miner: staff in view");
-	return (runUMReachingHomeStrategy());
+	if (adjFriends[ANT_STAFF] > 1) { // we're in the garden
+	    return (runMinerToRail1Strategy());
+	} else {
+	    return (runUMReachingHomeStrategy());
+	}
     } else if (adjFriends[ANT_ENGINEER] > 0) {
 	return (runUMBuildingRailStrategy());
     } else if (specLikeRL1()) {
@@ -930,9 +934,13 @@ function runLMStrategies () {
 	(friendsTotal + foesTotal >= 4)) {
 	// Congestion avoidance has high priority...
 	return (runLMCongestionResolutionStrategy());
-    } else if (adjFriends[ANT_STAFF] > 0) { // can only be the gardener
-	debugme("Laden Miner: gardener in view");
-	return (runLMReachingHomeStrategy());
+    } else if (adjFriends[ANT_STAFF] > 0) { // usually the gardener
+	debugme("Laden Miner: staff in view");
+	if (adjFriends[ANT_STAFF] > 1) { // we're in the garden
+	    return (runMinerToRail1Strategy());
+	} else {
+	    return (runLMReachingHomeStrategy());
+	}
     } else if (specLikeMFL()) {
 	debugme("Laden Miner: spectrum resembles left shaft wall");
 	return (runLMLeavingLeftWallStrategy());
@@ -2421,6 +2429,35 @@ function runLMCongestionResolutionStrategy() {
 }
 
 // Other Miners' strategies
+
+function runMinerToRail1Strategy() {
+    // Assert:  More than one friendly staff in view.  (So we're in the
+    // garden, on G5 or G6.)  Aim for rail1, whether laden or not, senior
+    // or not.  The compass is not set.
+    for (var i = 0; i < TOTAL_NBRS; i++) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    (view[CCW[i]].ant.type == ANT_STAFF) &&
+	    view[CCW[i+1]].ant && view[CCW[i+1]].ant.friend &&
+	    (view[CCW[i+1]].ant.type == ANT_STAFF)) {
+	    // Found two adjacent stuff;  the one at CCW[i] would be the
+	    // secretary.
+	    if (i & 1) {
+		debugme("Miner on G6, heading for rail1 RM0.");
+	    } else {
+		debugme("Miner on G5, heading for G6.");
+	    }
+	    // In CCW terms, both goals amount to the same thing:
+	    if (destOK[CCW[i+7]]) {
+		return {cell:CCW[i+7]};
+	    } else {
+		return CELL_NOP;
+	    }
+	}
+    }
+    // Loop came up empty, no two adjacent friendly staff in view after all.
+    debugme("Miner near staff:  This garden is a mess.");
+    return (runLostMinerStrategy(true));
+}
 
 function runLostMinerStrategy(totally) {
     if ((foodTotal > 0) && (myFood == 0)) {
