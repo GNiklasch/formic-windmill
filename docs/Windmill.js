@@ -246,21 +246,24 @@ LCR_FRLL0[LCL_MR0] = true;
 LCR_FRLL0[LCL_MR2] = true;
 LCR_FRLL0[LCL_RM0] = true; // near the beginning of rails 1 and 2
 LCR_FRLL0[LCL_RM2] = true; // after rails 1 and 3 have met
+// Also valid  (after resettling):  LCL_RR0, but this coincides with LCL_RM2.
 var LCR_FRLL1 = Array.from(FALSE_X9);
 LCR_FRLL1[LCL_CLEAR] = true;
 LCR_FRLL1[LCL_MR0] = true;
 LCR_FRLL1[LCL_MR2] = true;
-LCR_FRLL1[LCL_G3] = true; // near the beginning of rail 3
-// (last assignment is redundant because we've chosen G3 to be the same as MR0)
+// Also valid:  LCL_G3  (near the beginning of rail3) , but this is
+// the same as LCL_MR0.
 LCR_FRLL1[LCL_RR0] = true; // near the beginning of rails 1 and 2
 LCR_FRLL1[LCL_RM1] = true; // after rails 1 and 3 have met
+LCR_FRLL1[LCL_RR2] = true; // after a resettling maneuver
 var LCR_FRLL2 = Array.from(FALSE_X9);
 LCR_FRLL2[LCL_CLEAR] = true;
 LCR_FRLL2[LCL_MR0] = true;
 LCR_FRLL2[LCL_MR2] = true;
 LCR_FRLL2[LCL_RM0] = true; // after rails 1 and 3 have met
-LCR_FRLL2[LCL_MS_WRP] = true; // after shaft has wrapped
-// (last assignment is redundant - same as MR0)
+LCR_FRLL2[LCL_RR1_SHAFT_VACANT] = true; // after a resettling maneuver
+// The other valid RR1 states concide with LCL_CLEAR/MR0/MR2;
+// as does LCL_MS_WRP with LCL_MR0.
 
 // -- Addressing cells in the neighborhood: --
 
