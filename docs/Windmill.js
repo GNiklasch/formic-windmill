@@ -388,9 +388,9 @@ var PAT_FRL1G = [
 // There's really another special case on rails1 and 2, with
 // (from bottom to top)  G, R, white-or-MR0 to the left. #future#
 var PAT_FRL2 = [
-    LCR_FRLL2,  LCL_RL0,    LCL_RM0,
-    LCR_FRLL1,  LCL_RL2,    LCL_RM2,
-    LCR_FRLL0,  LCL_RL1,    LCR_GRM1
+    LCR_FRLL0,  LCL_RL0,    LCL_RM0,
+    LCR_FRLL2,  LCL_RL2,    LCL_RM2,
+    LCR_FRLL1,  LCL_RL1,    LCR_GRM1
 ];
 
 // General left rail edge, standing on RL0 cell, etc.:
