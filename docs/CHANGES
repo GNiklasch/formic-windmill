@@ -2,6 +2,7 @@
 
 ### Bugfixes:
 0017 Flawed defender logic in runQueenOperatingMineStrategy()
+0020 Off-by-one bug in the definition of PAT_FRL2
 
 ### Enhancements:
 0008 Deal with both staff in a miner's view
