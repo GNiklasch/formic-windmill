@@ -140,6 +140,7 @@ while (<>) {
     s/runGardenerGardeningTactic/rGGTc/g;
     s/runEngineerLeavingGardenTactic/rELGTc/g;
     s/runEngineerBuildingRailTactic/rEBRTc/g;
+    s/runEngineerCleaningLeftRailEdgeTactic/rECLRETc/g;
     s/runUMFreshCenterRailTactic/rUFCRTc/g;
     s/runUMCenterRailTactic/rUCRTc/g;
     s/runUMEnteringShaftTactic/rUESTc/g;

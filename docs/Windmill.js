@@ -3563,8 +3563,8 @@ function runEngineerBuildingRailTactic() {
 	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
 	}
 	// #future# Garden-ahead case would go here  (separate pattern needed).
-	if (compass < 0) { // still no idea where I am, give up and wait
-	    return CELL_NOP;
+	if (compass < 0) { // still no idea where I am
+	    return runEngineerCleaningLeftRailEdgeTactic();
 	}
     } else if (myColor == LCL_RL1) {
 	pattern = PAT_FRL1;
@@ -3582,7 +3582,7 @@ function runEngineerBuildingRailTactic() {
 	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
 	}
 	if (compass < 0) {
-	    return CELL_NOP;
+	    return runEngineerCleaningLeftRailEdgeTactic();
 	}
     } else if ((myColor == LCL_RR2) &&
 	       (specLateral[LCL_RL1] >= 1) &&
@@ -3611,6 +3611,55 @@ function runEngineerBuildingRailTactic() {
 	return CELL_NOP;
     }
     return CELL_NOP; // notreached
+}
+
+function runEngineerCleaningLeftRailEdgeTactic() {
+    // Assert:  At least one miner is in view  (and the gardener isn't),
+    // and attempts to match an appropriate PAT_FRLn with AIM-UP and
+    // tight quality control have failed.  This could mean that we're
+    // really at the rail head and waiting for our buddy to paint enough
+    // cells that we can be sure of our own way ahead, or that the RL and
+    // RM cells are already fine but more than one RLL cell is messed up.
+    // We deal here with the latter possibility by calling the pattern
+    // engine with AIM_RIGHT  (treating RLL country as "rearward" and
+    // assigning a very small weight to these cells),  after locating
+    // at least one buddy on a laterally adjacent cell and setting our
+    // compass on the assumption that she has more information than we do.
+    // If this doesn't result in a decent match, we refrain from doing
+    // anything.
+    var pattern;
+    var mismatch;
+    debugme("runEngineerCleaningLeftRailEdgeTactic...");
+    for (var i = 3; i < TOTAL_NBRS + 2; i += 2) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    ((view[CCW[i]].ant.type == ANT_JUNIOR_MINER) ||
+	     (view[CCW[i]].ant.type == ANT_SENIOR_MINER))) {
+	    compass = i - 3;
+	    if (myColor == LCL_RL0) {
+		pattern = PAT_FRL0;
+		debugme("- trying PAT_FRL0");
+		mismatch = patternCheck(pattern, AIM_RIGHT, 1, 0.3);
+		if (mismatch < 0) { // didn't recognize this as RL0, try RL2
+		    pattern = PAT_FRL2;
+		    debugme("- trying PAT_FRL2");
+		    mismatch = patternCheck(pattern, AIM_RIGHT, 1, 0.3);
+		}
+	    } else if (myColor == LCL_RL1) {
+		pattern = PAT_FRL1;
+		debugme("- trying PAT_FRL1");
+		mismatch = patternCheck(pattern, AIM_RIGHT, 1, 0.3);
+	    }
+	    debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
+	    if (mismatch > 0) { // decent match
+		// Fix a discrepancy "behind" us.
+		var cc = rearWrong[0];
+		return {cell:cc.v, color:fixup(pattern[cc.p])};
+	    }
+	    return CELL_NOP;
+	}
+    }
+    // No miner is _laterally_ adjacent, after all.
+    return CELL_NOP;
 }
 
 // ---- The Programmable Pattern Engine ----
