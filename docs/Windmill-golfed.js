@@ -263,11 +263,15 @@ xn=i;break;}}msm=patC(ptrn,AIMU,0,1);if ((msm==0)&&dOK[CCW[xn+5]]&&((view[CCW[xn
 (view[CCW[xn+4]].ant&&view[CCW[xn+4]].ant.friend))) {
 return {cell:CCW[xn+5]};} else if (msm<0) {var cc=fwdWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
 } else if (msm>0) {var cc=rearWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
-} else {return NOP;}return NOP;}function rEBRTc() {var ptrn;var msm;if (mC==LRL0) {ptrn=PTFRL0;msm=patC(ptrn,AIMU,1,1);if (xn<0) {ptrn=PTFRL2;msm=patC(ptrn,AIMU,1,1);}if ((xn<0)&&(eT>0)) {ptrn=PTFRL1;msm=patC(ptrn,AIMU,1,1);}if (xn<0) {return NOP;}} else if (mC==LRL1) {ptrn=PTFRL1;msm=patC(ptrn,AIMU,1,1);if ((xn<0)&&(eT>0)) {ptrn=PTFRL2;msm=patC(ptrn,AIMU,1,1);}if ((xn<0)&&(eT>0)) {ptrn=PTFRL0;msm=patC(ptrn,AIMU,1,1);}if (xn<0) {return NOP;}} else if ((mC==LRR2)&&(sL[LRL1]>=1)&&(sL[LRL0]==0)) {return {cell:POSC,color:LRL0};}if ((msm==0)&&dOK[CCW[xn+5]]&&((view[CCW[xn+3]].ant&&view[CCW[xn+3]].ant.friend)||
+} else {return NOP;}return NOP;}function rEBRTc() {var ptrn;var msm;if (mC==LRL0) {ptrn=PTFRL0;msm=patC(ptrn,AIMU,1,1);if (xn<0) {ptrn=PTFRL2;msm=patC(ptrn,AIMU,1,1);}if ((xn<0)&&(eT>0)) {ptrn=PTFRL1;msm=patC(ptrn,AIMU,1,1);}if (xn<0) {return rECLRETc();}} else if (mC==LRL1) {ptrn=PTFRL1;msm=patC(ptrn,AIMU,1,1);if ((xn<0)&&(eT>0)) {ptrn=PTFRL2;msm=patC(ptrn,AIMU,1,1);}if ((xn<0)&&(eT>0)) {ptrn=PTFRL0;msm=patC(ptrn,AIMU,1,1);}if (xn<0) {return rECLRETc();}} else if ((mC==LRR2)&&(sL[LRL1]>=1)&&(sL[LRL0]==0)) {return {cell:POSC,color:LRL0};}if ((msm==0)&&dOK[CCW[xn+5]]&&((view[CCW[xn+3]].ant&&view[CCW[xn+3]].ant.friend)||
 (view[CCW[xn+4]].ant&&view[CCW[xn+4]].ant.friend))) {
 return {cell:CCW[xn+5]};} else if (msm<0) {var cc=fwdWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
 } else if (msm>0) {var cc=rearWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
-} else {return NOP;}return NOP;}function patC(ptrn,targetCell,qG,wt) {
+} else {return NOP;}return NOP;}function rECLRETc() {var ptrn;var msm;for (var i=3; i<TN+2; i+=2) {if (view[CCW[i]].ant&&view[CCW[i]].ant.friend&&
+((view[CCW[i]].ant.type==AJM)||
+(view[CCW[i]].ant.type==ASM))) {
+xn=i - 3;if (mC==LRL0) {ptrn=PTFRL0;msm=patC(ptrn,AIMR,1,0.3);if (msm<0) {ptrn=PTFRL2;msm=patC(ptrn,AIMR,1,0.3);}} else if (mC==LRL1) {ptrn=PTFRL1;msm=patC(ptrn,AIMR,1,0.3);}if (msm>0) {var cc=rearWrong[0];return {cell:cc.v,color:fixup(ptrn[cc.p])};
+}return NOP;}}return NOP;}function patC(ptrn,targetCell,qG,wt) {
 if (xn>=0) {return (patCO(ptrn,targetCell,qG,wt,xn));
 } else {var msm;for (var o=0; o<TN; o+=2) {msm=patCO(ptrn,targetCell,qG,wt,o);
 if (xn>=0) {return msm;}}return PTNOM;}}function patCO(ptrn,targetCell,qG,wt,ortn) {
