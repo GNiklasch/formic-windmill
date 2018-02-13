@@ -2652,7 +2652,7 @@ function runQueenScramblingEvasionTactic() {
 	    if (view[CCW[i]].color == LCL_TRAIL) {
 		compass = i & 6; // ignore the LSB
 	    }
-	} // assert: compass is set now
+	} // Assert:  compass is set now
 	if ( destOK[CCW[compass+7]] && destOK[CCW[compass]] &&
 	     destOK[CCW[compass+1]] && destOK[CCW[compass+2]] &&
 	     destOK[CCW[compass+3]] ) {
@@ -3615,7 +3615,7 @@ function runEngineerBuildingRailTactic() {
 
 function runEngineerCleaningLeftRailEdgeTactic() {
     // Assert:  At least one miner is in view  (and the gardener isn't),
-    // and attempts to match an appropriate PAT_FRLn with AIM-UP and
+    // and attempts to match an appropriate PAT_FRLn with AIM_UP and
     // tight quality control have failed.  This could mean that we're
     // really at the rail head and waiting for our buddy to paint enough
     // cells that we can be sure of our own way ahead, or that the RL and
