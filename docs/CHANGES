@@ -1,4 +1,9 @@
-## v1.14 2018-02-12 patch release
+## v1.5 2018-02-16 patch release
+
+### Enhancements:
+0016 Review our defensive options against Vampire Mk.V (Quixotic)
+
+## v1.4 2018-02-12 patch release
 
 ### Bugfixes:
 0017 Flawed defender logic in runQueenOperatingMineStrategy()
@@ -8,7 +13,6 @@
 0008 Deal with both staff in a miner's view
 0010 A miner-assisted engineer could be more courageous
 0015 LM meeting the engineer on a damaged rail can do more than just stop
-0016 Review our defensive options against Vampire Mk.V (Quixotic)
 
 ## v1.3 2018-01-20 patch release
 
