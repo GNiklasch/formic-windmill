@@ -93,6 +93,7 @@ while (<>) {
     s/runQueenOperatingMineStrategy/rQOSy/g;
     s/runQueenConfusedStrategy/rQCSy/g;
     s/runSecOperatingStrategy/rSOSy/g;
+    s/runSecEmergencyStrategy/rSESy/g;
     s/runGardenerOperatingStrategy/rGOSy/g;
     s/runGardenerSettlingStrategy/rGSSy/g;
     s/runLostStaffStrategy/rLSSy/g;

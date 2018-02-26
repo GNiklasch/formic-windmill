@@ -39,6 +39,11 @@ var THRESHOLD2 = 17; // throttle back the spawning of junior miners
 var THRESHOLD3 = 67; // start creating senior miners
 var THRESHOLD4 = 120; // stop creating junior miners
 var THRESHOLD5 = 390; // stop spawning altogether
+// Threshold for evasion/resettling when under attack:
+// We'll only want to do this when we have enough food already to create
+// a new hub, and when losing all the food we have would lose a lot of
+// score points.  (We won't do it when we've had a bad start anyway.)
+var THRESHOLDX = 15;
 
 // We lock in queen's hoarded food  (don't expend it on new workers,
 // except in dire emergencies)  when the current amount modulo
@@ -241,21 +246,24 @@ LCR_FRLL0[LCL_MR0] = true;
 LCR_FRLL0[LCL_MR2] = true;
 LCR_FRLL0[LCL_RM0] = true; // near the beginning of rails 1 and 2
 LCR_FRLL0[LCL_RM2] = true; // after rails 1 and 3 have met
+// Also valid  (after resettling):  LCL_RR0, but this coincides with LCL_RM2.
 var LCR_FRLL1 = Array.from(FALSE_X9);
 LCR_FRLL1[LCL_CLEAR] = true;
 LCR_FRLL1[LCL_MR0] = true;
 LCR_FRLL1[LCL_MR2] = true;
-LCR_FRLL1[LCL_G3] = true; // near the beginning of rail 3
-// (last assignment is redundant because we've chosen G3 to be the same as MR0)
+// Also valid:  LCL_G3  (near the beginning of rail3) , but this is
+// the same as LCL_MR0.
 LCR_FRLL1[LCL_RR0] = true; // near the beginning of rails 1 and 2
 LCR_FRLL1[LCL_RM1] = true; // after rails 1 and 3 have met
+LCR_FRLL1[LCL_RR2] = true; // after a resettling maneuver
 var LCR_FRLL2 = Array.from(FALSE_X9);
 LCR_FRLL2[LCL_CLEAR] = true;
 LCR_FRLL2[LCL_MR0] = true;
 LCR_FRLL2[LCL_MR2] = true;
 LCR_FRLL2[LCL_RM0] = true; // after rails 1 and 3 have met
-LCR_FRLL2[LCL_MS_WRP] = true; // after shaft has wrapped
-// (last assignment is redundant - same as MR0)
+LCR_FRLL2[LCL_RR1_SHAFT_VACANT] = true; // after a resettling maneuver
+// The other valid RR1 states concide with LCL_CLEAR/MR0/MR2;
+// as does LCL_MS_WRP with LCL_MR0.
 
 // -- Addressing cells in the neighborhood: --
 
@@ -788,8 +796,6 @@ function runQueenStrategies () {
 	    if (cell.ant && cell.ant.type == ANT_STAFF) {
 		compass = i & 6;
 		if (i & 1) { // found (only) the secretary
-		    // #future#  At present, we *never* leave once we
-		    // have settled.
 		    return (runQueenLeavingStrategy());
 		} else { // found (only) the gardener
 		    return (runQueenSettlingStrategy());
@@ -818,9 +824,15 @@ function runQueenStrategies () {
 
 function runSecStrategies () {
     // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
-    // (facing in opposite directions);  gardener (not checked) had better
-    // be at CCW[compass+3].  For now there's only one strategy.
-    return (runSecOperatingStrategy());
+    // (facing in opposite directions).  Normally the gardener will be
+    // at CCW[compass+3].
+    if (view[CCW[compass+3]].ant &&
+	view[CCW[compass+3]].ant.friend &&
+	(view[CCW[compass+3]].ant.type == ANT_STAFF)) {
+	return (runSecOperatingStrategy());
+    } else {
+	return (runSecEmergencyStrategy());
+    }
 }
 
 function runGardenerStrategies () {
@@ -1031,9 +1043,9 @@ function runQueenScramblingStrategy() {
 /*
  * The queen is settling down and creating the initial team of workers:
  *
- * The gardener will kick everything off by setting her cell to
- * LCL_PHASE_BOOTING, and ensures that the queen's myColor is LCL_QC_RESET
- * (a synonym of LCL_CLEAR).  Since the gardener, being the oldest worker,
+ * The gardener will ensure that the queen's myColor is LCL_QC_RESET
+ * (a synonym of LCL_CLEAR)  and then kick everything off by setting her
+ * cell to LCL_PHASE_BOOTING.  Since the gardener, being the oldest worker,
  * moves first, then all the younger workers, and then the queen, we can
  * rely on the engineers and miners  (who can see the queen's cell's color)
  * to stay in view until we've created all of them and the secretary, in
@@ -1047,27 +1059,31 @@ function runQueenSettlingStrategy() {
     // Assert:  compass is set, gardener and self mutually at CCW[compass]
     // (facing in different directions).  Phase ends with the secretary at
     // our CCW[compass+1] and the clock not yet running.
-    if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET) &&
-	(view[CCW[compass]].color == LCL_PHASE_BOOTING)) {
-	if (destOK[CCW[compass+3]]) {
-	    return { cell:CCW[compass+3], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+5]]) {
-	    return { cell:CCW[compass+5], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+7]]) {
+    // When resettling after an emergency, we gain one tempo by creating
+    // the rail3 engineer  (on the side where we know an enemy to be near)
+    // one turn before the gardener sets her cell to LCL_PHASE_BOOTING.
+    if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET)) {
+	if (destOK[CCW[compass+7]]) {
 	    return { cell:CCW[compass+7], type:ANT_ENGINEER};
-	} else if (destOK[CCW[compass+2]]) {
-	    return { cell:CCW[compass+2], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+4]]) {
-	    return { cell:CCW[compass+4], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+6]]) {
-	    return { cell:CCW[compass+6], type:ANT_JUNIOR_MINER};
-	} else if (destOK[CCW[compass+1]]) {
-	    // finally, the secretary
-	    return { cell:CCW[compass+1], type:ANT_STAFF};
+	} else if (view[CCW[compass]].color == LCL_PHASE_BOOTING) {
+	    if (destOK[CCW[compass+3]]) {
+		return { cell:CCW[compass+3], type:ANT_ENGINEER};
+	    } else if (destOK[CCW[compass+5]]) {
+		return { cell:CCW[compass+5], type:ANT_ENGINEER};
+	    } else if (destOK[CCW[compass+6]]) {
+		return { cell:CCW[compass+6], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+2]]) {
+		return { cell:CCW[compass+2], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+4]]) {
+		return { cell:CCW[compass+4], type:ANT_JUNIOR_MINER};
+	    } else if (destOK[CCW[compass+1]]) {
+		// finally, the secretary
+		return { cell:CCW[compass+1], type:ANT_STAFF};
+	    }
 	}
+	// Assert:  still holding >= THRESHOLD0 food
     }
-    // assert: still holding >= THRESHOLD0 food
-    return CELL_NOP; // wait for the gardener to fix the colors
+    return CELL_NOP; // not normally reached
 }
 
 /*
@@ -1222,6 +1238,17 @@ function runQueenOperatingMineStrategy() {
 	    }
 	}
 	// Otherwise, fall through and get on with business as best we can.
+    } else if ((foesTotal > 0) &&
+	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
+	       (myFood > THRESHOLDX)) {
+	debugme("Thieves in our hall.");
+	// Step to RM0 of rail1 if possible, keeping the secretary
+	// in our lateral view and vice versa.
+	if (destOK[CCW[compass+2]]) {
+	    debugme("Going unhinged...");
+	    return {cell:CCW[compass+2]};
+	}
+	// Otherwise, fall through and get on with business as best we can.
     }
     if (!(LCR_QC_VALID[myColor])) {
 	// (Re)start our clock.  (Not at zero since we don't want it to
@@ -1301,9 +1328,17 @@ function runQueenOperatingMineStrategy() {
 }
 
 function runQueenLeavingStrategy() {
-    // Assert:  compass is set, gardener at CCW[compass].
-    // Placeholder function;  contemplated but not yet used.
-    return CELL_NOP; // placeholder
+    // Assert:  compass is set, secretary at CCW[compass+1].
+    debugme("Yukon ho!");
+    // We trust the secretary's navigation abilities.  If the secretary's
+    // way on is blocked, we end up going around her and ultimately
+    // toppling over  (if the gardener should come into our view again
+    // from a funny angle).  But then we'll still receive some food and
+    // some miners will still be able to turn around and depart...
+    if (destOK[CCW[compass+2]]) {
+	return {cell:CCW[compass+2]};
+    }
+    return CELL_NOP;
 }
 
 function runQueenConfusedStrategy() {
@@ -1315,8 +1350,7 @@ function runQueenConfusedStrategy() {
 
 function runSecOperatingStrategy() {
     // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
-    // (facing in opposite directions);  gardener (not checked) had better
-    // be at my CCW[compass+3]
+    // (facing in opposite directions);  gardener at my CCW[compass+3].
     // If our clock is not yet running, start it.  (Not at zero since we
     // don't want it to ring immediately.)
     if (!(LCR_SC_VALID[myColor])) {
@@ -1329,6 +1363,46 @@ function runSecOperatingStrategy() {
 	return {cell:POS_CENTER, color:incrementSc(myColor)};
     }
     return CELL_NOP; // notreached
+}
+
+function runSecEmergencyStrategy() {
+    // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
+    // (facing in opposite directions);  *no* gardener at CCW[compass+3].
+    // Our strategy is quick and dirty, trusting that most colors are still
+    // as they should be near home, without over-matching.  Any obstacle
+    // along our path will result in the windmill toppling over in some
+    // uncontrolled fashion.  (Can't win them all...)
+    debugme("Escorting the departing queen.");
+    if (view[CCW[compass+5]].ant &&
+	view[CCW[compass+5]].ant.friend &&
+	(view[CCW[compass+5]].ant.type == ANT_STAFF)) {
+	debugme("First step");
+	if (destOK[CCW[compass]]) {
+	    return {cell:CCW[compass]};
+	}
+    } else if ((myColor == LCL_RR0) &&
+	       (view[CCW[compass+5]].color == LCL_G6)) {
+	debugme("Second step");
+	if (destOK[CCW[compass]]) {
+	    return {cell:CCW[compass]};
+	}
+    } else {
+	debugme("Third step");
+	if (destOK[CCW[compass+3]]) {
+	    debugme("Taking up gardening.");
+	    return {cell:CCW[compass+3]};
+	    // This should result in persuading the queen to settle anew.
+	} else if (destOK[CCW[compass]]) {
+	    debugme("No garden soil here, going further.");
+	    // More than three steps mean we'll lose the fortuitous
+	    // alignment between old and new rails if we resettle later.
+	    return {cell:CCW[compass]};
+	}
+    }
+    // Otherwise, stay put.  The queen would step around us if possible,
+    // so the next time it's our turn we would try to do things at a
+    // new angle.
+    return CELL_NOP;
 }
 
 // Gardener's strategies
@@ -1406,8 +1480,11 @@ function runGardenerOperatingStrategy() {
 // Emergency staff strategy
 
 function runLostStaffStrategy() {
-    // Does not happen as long as the queen stays where she is once settled.
-    return CELL_NOP; // placeholder
+    // Tell our friends that we're lost.
+    if (myColor != LCL_CLEAR) {
+	return {cell:POS_CENTER, color:LCL_CLEAR};
+    }
+    return CELL_NOP;
 }
 
 // Engineers' strategies
@@ -1912,7 +1989,10 @@ function runUMReachingHomeStrategy() {
     for (var i = 0; i < TOTAL_NBRS; i++) {
 	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
 	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (destOK[CCW[i+1]]) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
 		return {cell:CCW[i+1]};
 	    }
 	}
@@ -2258,7 +2338,10 @@ function runLMReachingHomeStrategy() {
     for (var i = 0; i < TOTAL_NBRS; i++) {
 	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
 	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (destOK[CCW[i+1]]) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
 		return {cell:CCW[i+1]};
 	    }
 	}
