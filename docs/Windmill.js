@@ -1977,28 +1977,7 @@ function runUMShaftWrappingStrategy() {
 }
 
 function runUMReachingHomeStrategy() {
-    // In a similar vein:  The first shaft drilled off rail3 will wrap
-    // around onto the garden if it finds no food.  The miner will dispute
-    // some colors with the gardener until the gardener is momentarily
-    // preoccupied with clock business, allowing us to step forward,
-    // and then we'll know we're close to home.  (Or we may have got
-    // confused and found the secretary by lucky accident.  Or we have
-    // stepped aside to the first RR0 cell of rail1, where we see the
-    // secretary but not the queen.)  Either way... try going clockwise
-    // until we're on a rail again.
-    for (var i = 0; i < TOTAL_NBRS; i++) {
-	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
-	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (view[CCW[i]].color == LCL_CLEAR) {
-		// Oops, we've met staff who is herself lost.
-		return (runLostMinerStrategy(true));
-	    } else if (destOK[CCW[i+1]]) {
-		return {cell:CCW[i+1]};
-	    }
-	}
-    }
-    // No cigar... for now, wait for a better opportunity.
-    return CELL_NOP;
+    return (runMinerNavigatingTheGardenTactic());
 }
 
 function runUMCongestionResolutionStrategy() {
@@ -2335,19 +2314,7 @@ function runLMReachingHomeStrategy() {
     }
     // If this didn't work, we do what a UM would do in this case:  locate the
     // friendly staff and circle her clockwise.
-    for (var i = 0; i < TOTAL_NBRS; i++) {
-	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
-	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (view[CCW[i]].color == LCL_CLEAR) {
-		// Oops, we've met staff who is herself lost.
-		return (runLostMinerStrategy(true));
-	    } else if (destOK[CCW[i+1]]) {
-		return {cell:CCW[i+1]};
-	    }
-	}
-    }
-    // No cigar... wait for a better opportunity.
-    return CELL_NOP;
+    return (runMinerNavigatingTheGardenTactic());
 }
 
 function runLMLeaveRL1Strategy() {
@@ -2472,8 +2439,13 @@ function runLostMinerStrategy(totally) {
 	}
     }
     if (totally & (friendsTotal == 0)) {
-	// Selectively erase some paint  (but don't even think of attempting
+	// Selectively mess with the arena  (but don't even think of attempting
 	// to battle a pal over it):
+	if (((myColor == COL_YELLOW) && (specNbrs[COL_YELLOW] == 0)) ||
+	    ((myColor == COL_RED) && (specNbrs[COL_RED] == 0))) {
+	    return {cell:POS_CENTER, color:COL_PURPLE};
+	}
+	// Selectively erase some paint:
 	if (((myColor == COL_GREEN) && (specNbrs[COL_GREEN] == 0)) ||
 	    ((myColor == COL_CYAN) && (specNbrs[COL_CYAN] == 0)) ||
 	    ((myColor == COL_BLUE) && (specNbrs[COL_BLUE] == 0)) ||
@@ -2503,7 +2475,10 @@ function runLostMinerStrategy(totally) {
 	    [COL_GREEN, COL_BLUE, COL_CYAN, COL_PURPLE, COL_YELLOW, COL_RED, COL_BLACK];
 	for (var ci = 0; ci < preferredColors.length; ci++) {
 	    var c = preferredColors[ci];
-	    if ((myColor != c) && (specNbrs[c] > 0)) {
+	    if (myColor == c) {
+		break; // don't go round in circles...
+	    }
+	    if (specNbrs[c] > 0) {
 		for (var i = 1; i < TOTAL_NBRS; i++) {
 		    if ((view[CCW[i]].color == c) && destOK[CCW[i]]) {
 			return {cell:CCW[i]};
@@ -2512,6 +2487,9 @@ function runLostMinerStrategy(totally) {
 	    }
 	}
     }
+    // Have run out of ideas - resort to random walking.
+    // (Caveat maintainer:  Any further color-erasing at this point
+    // would be liable to damage the rails.)
     if (ACT_RANDOMLY_WHEN_CONFUSED) {
 	for (var i = 1; i < TOTAL_NBRS; i += 2) {
 	    // lateral directions preferred
@@ -3051,7 +3029,7 @@ function runUMCenterRailTactic() {
 	return (runUMPreparingShaftStrategy());
     }
     if (compass < 0) { // still no idea where I am, give up
-	return (runLostMinerStrategy(false));
+	return (runLostMinerStrategy(true));
     }
     // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
@@ -3460,7 +3438,7 @@ function runLMCenterRailTactic() {
 	    return (runLMDepartingFromShaftStrategy());
 	}
 	// Still no idea where I am, give up.
-	return (runLostMinerStrategy(false));
+	return (runLostMinerStrategy(true));
     }
     // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
@@ -3541,6 +3519,45 @@ function runLMLeaveRRTactic() {
     } else { // wait for the obstacles to go away
 	return CELL_NOP;
     }
+}
+
+function runMinerNavigatingTheGardenTactic() {
+    // The first shaft drilled off rail3 will wrap around onto the garden
+    // if it finds no food.  The miner will dispute some colors with the
+    // gardener until the gardener is momentarily preoccupied with clock
+    // business, allowing us to step forward, and then we'll know we're
+    // close to home.  (Or we may have got confused and found the secretary
+    // by lucky accident.  Or we have stepped aside to the first RR0 cell of
+    // rail1, where we see the secretary but not the queen.)  Either way...
+    // try going clockwise until we're on a rail again.
+    for (var i = 0; i < TOTAL_NBRS; i++) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    (view[CCW[i]].ant.type == ANT_STAFF)) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		// Assuming the queen has resettled, look for the new garden.
+		if (i & 1) {
+		    if ((view[CCW[i+3]].color == LCL_G5) &&
+			destOK[CCW[i+3]]) {
+			return {cell:CCW[i+3]};
+		    }
+		} else {
+		    if ((view[CCW[i+4]].color == LCL_G6) &&
+			destOK[CCW[i+4]]) {
+			return {cell:CCW[i+4]};
+		    } else if ((view[CCW[i+3]].color == LCL_G5) &&
+			       destOK[CCW[i+3]]) {
+			return {cell:CCW[i+3]};
+		    }
+		}
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
+		return {cell:CCW[i+1]};
+	    }
+	}
+    }
+    // No cigar... for now, wait for a better opportunity.
+    return CELL_NOP;
 }
 
 // Engineers' tactics
