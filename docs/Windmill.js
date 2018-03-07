@@ -1116,11 +1116,12 @@ function runQueenSettlingStrategy() {
  * state-carrying cells makes the affair more robust against generic intruders,
  * and the staff do not have that much else to do...
  *
- * Dedicated intruders could of course easily stop our clock.  But what would
- * be the point?  Its main purpose is to prevent us from turning too much
- * food into ants, and with a stopped clock we'd hoard *all* still-arriving
- * food and turn none of it into ants.  We would just lose part of our self-
- * repair capabilities...
+ * Dedicated intruders could of course easily stop our clock  (Vampire Mk.6
+ * actually does).  With a stopped clock we'd hoard *all* still-arriving
+ * food and turn none of it into ants, except for a home guard of defenders
+ * when we need one.  We'd lose part of our self-repair capabilities, and
+ * we need to be careful not to allow an enemy to leech more food from us
+ * than we can leech back, and not to waste food on an army of defenders.
  */
 
 function runQueenOperatingMineStrategy() {
@@ -1136,30 +1137,34 @@ function runQueenOperatingMineStrategy() {
 		(view[CCW[compass+i]].ant.type == ANT_QUEEN) &&
 		!view[CCW[compass+i]].ant.friend) {
 		debugme("Enemy sighted at " + i + "!");
-		if (destOK[CCW[compass+i-1]]) {
-		    debugme("--- outflanking at " + (i-1));
-		    return {cell:CCW[compass+i-1], type:ANT_JUNIOR_MINER};
-		} else if (destOK[CCW[compass+i+1]]) {
-		    debugme("--- outflanking at " + (i+1));
-		    return {cell:CCW[compass+i+1], type:ANT_JUNIOR_MINER};
+		// Randomize the reaction somewhat:
+		var j = (compass & 1) ? 1 : -1;
+		if (destOK[CCW[compass+i-j]]) {
+		    debugme("--- outflanking at " + (i-j));
+		    return {cell:CCW[compass+i-j], type:ANT_JUNIOR_MINER};
+		} else if (destOK[CCW[compass+i+j]]) {
+		    debugme("--- outflanking at " + (i+j));
+		    return {cell:CCW[compass+i+j], type:ANT_JUNIOR_MINER};
 		} else if (i == 5) {
 		    // When the enemy queen is on an edge neighbor cell, we can
 		    // also use the preceding or following edge cells, not just
 		    // the corners.  When i == 3 or 7, the secretary is already
 		    // in such a place.  Don't go over the top, though -- more
 		    // than three defenders are unnecessary.
-		    if (destOK[CCW[compass+3]] &&
+		    var i1 = 5 - 2*j;
+		    var i2 = 5 + 2*j; // 3 and 7, in some random order
+		    if (destOK[CCW[compass+i1]] &&
 			!(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend &&
 			  view[CCW[compass+6]].ant && view[CCW[compass+6]].ant.friend &&
-			  view[CCW[compass+7]].ant && view[CCW[compass+7]].ant.friend)) {
-			debugme("--- double-outflanking at 3");
-			return {cell:CCW[compass+3], type:ANT_JUNIOR_MINER};
-		    } else if (destOK[CCW[compass+7]] &&
+			  view[CCW[compass+i2]].ant && view[CCW[compass+i2]].ant.friend)) {
+			debugme("--- double-outflanking at " + i1);
+			return {cell:CCW[compass+i1], type:ANT_JUNIOR_MINER};
+		    } else if (destOK[CCW[compass+i2]] &&
 			       !(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend &&
 				 view[CCW[compass+6]].ant && view[CCW[compass+6]].ant.friend &&
-				 view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend)) {
-			debugme("--- double-outflanking at 7");
-			return {cell:CCW[compass+7], type:ANT_JUNIOR_MINER};
+				 view[CCW[compass+i1]].ant && view[CCW[compass+i1]].ant.friend)) {
+			debugme("--- double-outflanking at " + i2);
+			return {cell:CCW[compass+i2], type:ANT_JUNIOR_MINER};
 		    }
 		} else if ((i == 3) &&
 			   destOK[CCW[compass+5]] &&
@@ -1238,17 +1243,61 @@ function runQueenOperatingMineStrategy() {
 	    }
 	}
 	// Otherwise, fall through and get on with business as best we can.
-    } else if ((foesTotal > 0) &&
-	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
-	       (myFood > THRESHOLDX)) {
-	debugme("Thieves in our hall.");
-	// Step to RM0 of rail1 if possible, keeping the secretary
-	// in our lateral view and vice versa.
-	if (destOK[CCW[compass+2]]) {
-	    debugme("Going unhinged...");
-	    return {cell:CCW[compass+2]};
+    } else if (foesTotal > 0) {
+	var bandits = adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4];
+	if ((bandits >= 2) && (myFood > THRESHOLDX)) {
+	    debugme("Thieves in our hall.");
+	    // Step to RM0 of rail1 if possible, keeping the secretary
+	    // in our lateral view and vice versa.  With any luck, this
+	    // will result within a dozen-odd steps in a new hub at
+	    // diagonal distance 3 from the old one.
+	    if (destOK[CCW[compass+2]]) {
+		debugme("Going unhinged...");
+		return {cell:CCW[compass+2]};
+	    }
+	    // Otherwise, fall through.
 	}
-	// Otherwise, fall through and get on with business as best we can.
+	if ((bandits >= 1) && (myFood > 0)) {
+	    // Locate the bandit  (or at least one of them).  If there isn't
+	    // already a laden miner next to it, and if a suitable free cell
+	    // is available, spawn a defender.  The choice of cell must be
+	    // randomized - a defender who can't see the enemy queen would
+	    // simply run away and leave a free cell behind.  We use both
+	    // orientation randomness and the secretary's clock counter
+	    // for this.
+	    for (var i = 2; i < TOTAL_NBRS; i++) {
+		var c = CCW[compass+i];
+		var c1, c2;
+		if ((compass == 2) || isScZero(view[CCW[compass+1]].color)) {
+		    c1 = CCW[compass+i-1];
+		    c2 = CCW[compass+i+1];
+		} else if ((compass == 6) || isScOne(view[CCW[compass+1]].color)) {
+		    c1 = CCW[compass+i+1];
+		    c2 = CCW[compass+i-1];
+		} else {
+		    // Rate-limit our reactions.
+		    break;
+		}
+		if (view[c].ant &&
+		    !view[c].ant.friend &&
+		    (view[c].ant.food == 0)) {
+		    debugme("Fingering a bandit.");
+		    if (destOK[c1] &&
+			!(view[c2].ant &&
+			  view[c2].ant.friend &&
+			  view[c2].ant.food > 0)) {
+			return {cell:c1, type:ANT_JUNIOR_MINER};
+		    } else if (destOK[c2] &&
+			       !(view[c1].ant &&
+				 view[c1].ant.friend &&
+				 view[c1].ant.food > 0)) {
+			return {cell:c2, type:ANT_JUNIOR_MINER};
+		    }
+		    break;
+		}
+	    }
+	    // Fall through if the loop didn't result in a return.
+	}
     }
     if (!(LCR_QC_VALID[myColor])) {
 	// (Re)start our clock.  (Not at zero since we don't want it to
@@ -1544,7 +1593,31 @@ function runEngineerAloneStrategy() {
 // Unladen Miners' strategies
 
 function runUMAtHomeStrategy() {
-    // Assert:  compass is set.
+    // Assert:  compass is set, as is myQueenPos.
+    // Deal with possible intruders first:
+    if ((foesTotal > 0) &&
+	(adjFoes[ANT_QUEEN] + adjUnladenFoes[1] + adjUnladenFoes[2] +
+	 adjUnladenFoes[3] + adjUnladenFoes[4] > 0)) {
+	var common;
+	debugme("UM at home suspecting a burglar");
+	if (myQueenPos == 0) {
+	    common = [1, 7];
+	} else {
+	    common = [0, 2, 3, 7];
+	}
+	for (var i = 0; i < common.length; i++) {
+	    debugme("UM at home: inspecting compass+" + common[i]);
+	    var c = CCW[compass+common[i]];
+	    if (view[c].ant &&
+		!view[c].ant.friend &&
+		((view[c].ant.type == ANT_QUEEN) ||
+		 (view[c].ant.food == 0))) {
+		debugme("UM at home spotted a burglar");
+		// Stay put.
+		return CELL_NOP;
+	    }
+	}
+    }
     // Don't move until queen's clock counter has turned valid, but may
     // paint ahead.
     // We start out in the middle of the rail with the queen diagonally
