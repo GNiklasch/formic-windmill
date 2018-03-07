@@ -922,8 +922,8 @@ function runDefenderStrategies() {
 		// If we stay here, might as well paint something...
 		if (view[CCW[i]].color != LCL_CLEAR) {
 		    return {cell:CCW[i], color:LCL_CLEAR};
-		} else if (myColor != LCL_CLEAR) {
-		    return {cell:POS_CENTER, color:LCL_CLEAR};
+		} else if (myColor != COL_PURPLE) {
+		    return {cell:POS_CENTER, color:COL_PURPLE};
 		}
 	    }
 	}
