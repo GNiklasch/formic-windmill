@@ -1601,12 +1601,13 @@ function runUMAtHomeStrategy() {
 		       destOK[CCW[compass+4]]) {
 		// step ahead to RM1, lifelined
 		return {cell:CCW[compass+4]};
+	    } else if (destOK[CCW[compass+5]]) {
+		// leave via RL1
+		return {cell:CCW[compass+5]};
 	    }
 	}
     }
-    // #future# handle worker-at-RL0 situation
-    // (check and fix pattern, then return to RM0 if possible)
-    return CELL_NOP;
+    return CELL_NOP; // fallback
 }
 
 function runUMBuildingRailStrategy() {
