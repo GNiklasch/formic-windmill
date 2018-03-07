@@ -873,6 +873,60 @@ function runDefenderStrategies() {
 	    (adjFriends[ANT_QUEEN] > 0) ? " and our own" : "");
     if (adjFriends[ANT_QUEEN] > 0) {
 	return (runDefendingHomeStrategy());
+    } else if (adjLadenFriends[ANT_JUNIOR_MINER] +
+	       adjLadenFriends[ANT_SENIOR_MINER] +
+	       adjLadenFriends[ANT_ENGINEER] +
+	       adjLadenFriends[ANT_STAFF] >= 2) {
+	for (var i = 0; i < TOTAL_NBRS; i++) {
+	    if (view[CCW[i]].ant &&
+		(view[CCW[i]].ant.type == ANT_QUEEN)) {
+		// (necessarily an enemy queen)
+		debugme("Facing enemy queen at " + i);
+		if (i & 1) {
+		    if ((view[CCW[i+1]].ant &&
+			 view[CCW[i+1]].ant.friend &&
+			 view[CCW[i+2]].ant &&
+			 view[CCW[i+2]].ant.friend) ||
+			(view[CCW[i-1]].ant &&
+			 view[CCW[i-1]].ant.friend &&
+			 view[CCW[i+6]].ant &&
+			 view[CCW[i+6]].ant.friend) ||
+			(view[CCW[i+2]].ant &&
+			 view[CCW[i+2]].ant.friend &&
+			 view[CCW[i+6]].ant &&
+			 view[CCW[i+6]].ant.friend)) {
+			if (destOK[CCW[i+4]]) {
+			    return {cell:CCW[i+4]};
+			} else if (destOK[CCW[i+3]]) {
+			    return {cell:CCW[i+3]};
+			} else if (destOK[CCW[i+5]]) {
+			    return {cell:CCW[i+5]};
+			}
+		    }
+		} else {
+		    if (view[CCW[i+1]].ant && view[CCW[i+1]].ant.friend &&
+			view[CCW[i+7]].ant && view[CCW[i+7]].ant.friend) {
+			if (destOK[CCW[i+4]]) {
+			    return {cell:CCW[i+4]};
+			} else if (destOK[CCW[i+3]]) {
+			    return {cell:CCW[i+3]};
+			} else if (destOK[CCW[i+5]]) {
+			    return {cell:CCW[i+5]};
+			} else if (destOK[CCW[i+6]]) {
+			    return {cell:CCW[i+6]};
+			} else if (destOK[CCW[i+2]]) {
+			    return {cell:CCW[i+2]};
+			}
+		    }
+		}
+		// If we stay here, might as well paint something...
+		if (view[CCW[i]].color != LCL_CLEAR) {
+		    return {cell:CCW[i], color:LCL_CLEAR};
+		} else if (myColor != LCL_CLEAR) {
+		    return {cell:POS_CENTER, color:LCL_CLEAR};
+		}
+	    }
+	}
     }
     return CELL_NOP; // Neener, neener...
 }
