@@ -870,13 +870,10 @@ function runDefenderStrategies() {
     // However...
     debugme(((myFood > 0) ? "L" : "Unl") + "aden Miner sees " +
 	    adjFoes[ANT_QUEEN] + " enemy queen(s)" +
-	    (adjFriends[ANT_QUEEN] > 0) ? " and our own" : "");
+	    ((adjFriends[ANT_QUEEN] > 0) ? " and our own" : ""));
     if (adjFriends[ANT_QUEEN] > 0) {
 	return (runDefendingHomeStrategy());
-    } else if (adjLadenFriends[ANT_JUNIOR_MINER] +
-	       adjLadenFriends[ANT_SENIOR_MINER] +
-	       adjLadenFriends[ANT_ENGINEER] +
-	       adjLadenFriends[ANT_STAFF] >= 2) {
+    } else {
 	for (var i = 0; i < TOTAL_NBRS; i++) {
 	    if (view[CCW[i]].ant &&
 		(view[CCW[i]].ant.type == ANT_QUEEN)) {
@@ -918,12 +915,23 @@ function runDefenderStrategies() {
 			    return {cell:CCW[i+2]};
 			}
 		    }
+		    // Otherwise, randomly move to have the enemy queen
+		    // in lateral instead of diagonal view, if possible.
+		    if ((i <= 2) && destOK[CCW[i+7]]) {
+			return {cell:CCW[i+7]};
+		    }
+		    if ((i >= 4) && destOK[CCW[i+1]]) {
+			return {cell:CCW[i+1]};
+		    }
 		}
-		// If we stay here, might as well paint something...
-		if (view[CCW[i]].color != LCL_CLEAR) {
-		    return {cell:CCW[i], color:LCL_CLEAR};
-		} else if (myColor != COL_PURPLE) {
-		    return {cell:POS_CENTER, color:COL_PURPLE};
+		// If we stay here, and aren't going to clash with a friend,
+		// we might as well paint something...
+		if (friendsTotal == 0) {
+		    if (view[CCW[i]].color != COL_PURPLE) {
+			return {cell:CCW[i], color:COL_PURPLE};
+		    } else if (myColor != LCL_CLEAR) {
+			return {cell:POS_CENTER, color:LCL_CLEAR};
+		    }
 		}
 	    }
 	}
