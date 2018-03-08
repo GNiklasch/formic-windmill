@@ -3419,9 +3419,22 @@ function runLMLeavingRightWallTactic() {
 
 function runLMWrappingOntoRailTactic(pattern, mismatch) {
     // Assert:  compass is set, PAT_MS0_WRAPPING has matched.
+    // Unlike the UM case, there's no point attempting to propagate the
+    // shaft-has-wrapped condition to the shaft head because a laden
+    // miner would erase the RM1 marking as soon as she reaches mid-rail.
+    // Aim for RL1, or if that is occupied, RL0.
     debugme("LMWrappingOntoRailTactic...");
-    // #future# (hasn't yet occurred often enough to look worth the effort)
-    return CELL_NOP; // placeholder
+    if (mismatch < 0) {
+	// Fix a forward discrepancy (can't really happen).
+	var cc = fwdWrong[0];
+	return {cell:cc.v, color:fixup(pattern[cc.p])};
+    } else if (destOK[CCW[compass+1]]) {
+	return {cell:CCW[compass+1]};
+    } else if (destOK[CCW[compass]]) {
+	return {cell:CCW[compass]};
+    } else {
+	return CELL_NOP;
+    }
 }
 
 function runLMAscendingShaftTactic(pattern, mismatch) {

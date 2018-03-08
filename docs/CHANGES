@@ -4,6 +4,7 @@
 0022 Confront bandits properly
 
 ### Enhancements:
+0018 Laden miners just off the rail edge should wrap onto the rail, too
 0019 Confused miners' random walks should avoid traps
 0023 Defenders away from home could be more inventive
 
