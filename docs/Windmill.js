@@ -870,9 +870,71 @@ function runDefenderStrategies() {
     // However...
     debugme(((myFood > 0) ? "L" : "Unl") + "aden Miner sees " +
 	    adjFoes[ANT_QUEEN] + " enemy queen(s)" +
-	    (adjFriends[ANT_QUEEN] > 0) ? " and our own" : "");
+	    ((adjFriends[ANT_QUEEN] > 0) ? " and our own" : ""));
     if (adjFriends[ANT_QUEEN] > 0) {
 	return (runDefendingHomeStrategy());
+    } else {
+	for (var i = 0; i < TOTAL_NBRS; i++) {
+	    if (view[CCW[i]].ant &&
+		(view[CCW[i]].ant.type == ANT_QUEEN)) {
+		// (necessarily an enemy queen)
+		debugme("Facing enemy queen at " + i);
+		if (i & 1) {
+		    if ((view[CCW[i+1]].ant &&
+			 view[CCW[i+1]].ant.friend &&
+			 view[CCW[i+2]].ant &&
+			 view[CCW[i+2]].ant.friend) ||
+			(view[CCW[i-1]].ant &&
+			 view[CCW[i-1]].ant.friend &&
+			 view[CCW[i+6]].ant &&
+			 view[CCW[i+6]].ant.friend) ||
+			(view[CCW[i+2]].ant &&
+			 view[CCW[i+2]].ant.friend &&
+			 view[CCW[i+6]].ant &&
+			 view[CCW[i+6]].ant.friend)) {
+			if (destOK[CCW[i+4]]) {
+			    return {cell:CCW[i+4]};
+			} else if (destOK[CCW[i+3]]) {
+			    return {cell:CCW[i+3]};
+			} else if (destOK[CCW[i+5]]) {
+			    return {cell:CCW[i+5]};
+			}
+		    }
+		} else {
+		    if (view[CCW[i+1]].ant && view[CCW[i+1]].ant.friend &&
+			view[CCW[i+7]].ant && view[CCW[i+7]].ant.friend) {
+			if (destOK[CCW[i+4]]) {
+			    return {cell:CCW[i+4]};
+			} else if (destOK[CCW[i+3]]) {
+			    return {cell:CCW[i+3]};
+			} else if (destOK[CCW[i+5]]) {
+			    return {cell:CCW[i+5]};
+			} else if (destOK[CCW[i+6]]) {
+			    return {cell:CCW[i+6]};
+			} else if (destOK[CCW[i+2]]) {
+			    return {cell:CCW[i+2]};
+			}
+		    }
+		    // Otherwise, randomly move to have the enemy queen
+		    // in lateral instead of diagonal view, if possible.
+		    if ((i <= 2) && destOK[CCW[i+7]]) {
+			return {cell:CCW[i+7]};
+		    }
+		    if ((i >= 4) && destOK[CCW[i+1]]) {
+			return {cell:CCW[i+1]};
+		    }
+		}
+		// If we stay here, and aren't going to clash with a friend,
+		// we might as well paint something...
+		if (friendsTotal == 0) {
+		    if (view[CCW[i]].color != COL_PURPLE) {
+			return {cell:CCW[i], color:COL_PURPLE};
+		    } else if (myColor != LCL_CLEAR) {
+			return {cell:POS_CENTER, color:LCL_CLEAR};
+		    }
+		}
+	    }
+	}
     }
     return CELL_NOP; // Neener, neener...
 }
@@ -1116,11 +1178,12 @@ function runQueenSettlingStrategy() {
  * state-carrying cells makes the affair more robust against generic intruders,
  * and the staff do not have that much else to do...
  *
- * Dedicated intruders could of course easily stop our clock.  But what would
- * be the point?  Its main purpose is to prevent us from turning too much
- * food into ants, and with a stopped clock we'd hoard *all* still-arriving
- * food and turn none of it into ants.  We would just lose part of our self-
- * repair capabilities...
+ * Dedicated intruders could of course easily stop our clock  (Vampire Mk.6
+ * actually does).  With a stopped clock we'd hoard *all* still-arriving
+ * food and turn none of it into ants, except for a home guard of defenders
+ * when we need one.  We'd lose part of our self-repair capabilities, and
+ * we need to be careful not to allow an enemy to leech more food from us
+ * than we can leech back, and not to waste food on an army of defenders.
  */
 
 function runQueenOperatingMineStrategy() {
@@ -1136,30 +1199,34 @@ function runQueenOperatingMineStrategy() {
 		(view[CCW[compass+i]].ant.type == ANT_QUEEN) &&
 		!view[CCW[compass+i]].ant.friend) {
 		debugme("Enemy sighted at " + i + "!");
-		if (destOK[CCW[compass+i-1]]) {
-		    debugme("--- outflanking at " + (i-1));
-		    return {cell:CCW[compass+i-1], type:ANT_JUNIOR_MINER};
-		} else if (destOK[CCW[compass+i+1]]) {
-		    debugme("--- outflanking at " + (i+1));
-		    return {cell:CCW[compass+i+1], type:ANT_JUNIOR_MINER};
+		// Randomize the reaction somewhat:
+		var j = (compass & 1) ? 1 : -1;
+		if (destOK[CCW[compass+i-j]]) {
+		    debugme("--- outflanking at " + (i-j));
+		    return {cell:CCW[compass+i-j], type:ANT_JUNIOR_MINER};
+		} else if (destOK[CCW[compass+i+j]]) {
+		    debugme("--- outflanking at " + (i+j));
+		    return {cell:CCW[compass+i+j], type:ANT_JUNIOR_MINER};
 		} else if (i == 5) {
 		    // When the enemy queen is on an edge neighbor cell, we can
 		    // also use the preceding or following edge cells, not just
 		    // the corners.  When i == 3 or 7, the secretary is already
 		    // in such a place.  Don't go over the top, though -- more
 		    // than three defenders are unnecessary.
-		    if (destOK[CCW[compass+3]] &&
+		    var i1 = 5 - 2*j;
+		    var i2 = 5 + 2*j; // 3 and 7, in some random order
+		    if (destOK[CCW[compass+i1]] &&
 			!(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend &&
 			  view[CCW[compass+6]].ant && view[CCW[compass+6]].ant.friend &&
-			  view[CCW[compass+7]].ant && view[CCW[compass+7]].ant.friend)) {
-			debugme("--- double-outflanking at 3");
-			return {cell:CCW[compass+3], type:ANT_JUNIOR_MINER};
-		    } else if (destOK[CCW[compass+7]] &&
+			  view[CCW[compass+i2]].ant && view[CCW[compass+i2]].ant.friend)) {
+			debugme("--- double-outflanking at " + i1);
+			return {cell:CCW[compass+i1], type:ANT_JUNIOR_MINER};
+		    } else if (destOK[CCW[compass+i2]] &&
 			       !(view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend &&
 				 view[CCW[compass+6]].ant && view[CCW[compass+6]].ant.friend &&
-				 view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend)) {
-			debugme("--- double-outflanking at 7");
-			return {cell:CCW[compass+7], type:ANT_JUNIOR_MINER};
+				 view[CCW[compass+i1]].ant && view[CCW[compass+i1]].ant.friend)) {
+			debugme("--- double-outflanking at " + i2);
+			return {cell:CCW[compass+i2], type:ANT_JUNIOR_MINER};
 		    }
 		} else if ((i == 3) &&
 			   destOK[CCW[compass+5]] &&
@@ -1238,17 +1305,61 @@ function runQueenOperatingMineStrategy() {
 	    }
 	}
 	// Otherwise, fall through and get on with business as best we can.
-    } else if ((foesTotal > 0) &&
-	       (adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4] >= 2) &&
-	       (myFood > THRESHOLDX)) {
-	debugme("Thieves in our hall.");
-	// Step to RM0 of rail1 if possible, keeping the secretary
-	// in our lateral view and vice versa.
-	if (destOK[CCW[compass+2]]) {
-	    debugme("Going unhinged...");
-	    return {cell:CCW[compass+2]};
+    } else if (foesTotal > 0) {
+	var bandits = adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4];
+	if ((bandits >= 2) && (myFood > THRESHOLDX)) {
+	    debugme("Thieves in our hall.");
+	    // Step to RM0 of rail1 if possible, keeping the secretary
+	    // in our lateral view and vice versa.  With any luck, this
+	    // will result within a dozen-odd steps in a new hub at
+	    // diagonal distance 3 from the old one.
+	    if (destOK[CCW[compass+2]]) {
+		debugme("Going unhinged...");
+		return {cell:CCW[compass+2]};
+	    }
+	    // Otherwise, fall through.
 	}
-	// Otherwise, fall through and get on with business as best we can.
+	if ((bandits >= 1) && (myFood > 0)) {
+	    // Locate the bandit  (or at least one of them).  If there isn't
+	    // already a laden miner next to it, and if a suitable free cell
+	    // is available, spawn a defender.  The choice of cell must be
+	    // randomized - a defender who can't see the enemy queen would
+	    // simply run away and leave a free cell behind.  We use both
+	    // orientation randomness and the secretary's clock counter
+	    // for this.
+	    for (var i = 2; i < TOTAL_NBRS; i++) {
+		var c = CCW[compass+i];
+		var c1, c2;
+		if ((compass == 2) || isScZero(view[CCW[compass+1]].color)) {
+		    c1 = CCW[compass+i-1];
+		    c2 = CCW[compass+i+1];
+		} else if ((compass == 6) || isScOne(view[CCW[compass+1]].color)) {
+		    c1 = CCW[compass+i+1];
+		    c2 = CCW[compass+i-1];
+		} else {
+		    // Rate-limit our reactions.
+		    break;
+		}
+		if (view[c].ant &&
+		    !view[c].ant.friend &&
+		    (view[c].ant.food == 0)) {
+		    debugme("Fingering a bandit.");
+		    if (destOK[c1] &&
+			!(view[c2].ant &&
+			  view[c2].ant.friend &&
+			  view[c2].ant.food > 0)) {
+			return {cell:c1, type:ANT_JUNIOR_MINER};
+		    } else if (destOK[c2] &&
+			       !(view[c1].ant &&
+				 view[c1].ant.friend &&
+				 view[c1].ant.food > 0)) {
+			return {cell:c2, type:ANT_JUNIOR_MINER};
+		    }
+		    break;
+		}
+	    }
+	    // Fall through if the loop didn't result in a return.
+	}
     }
     if (!(LCR_QC_VALID[myColor])) {
 	// (Re)start our clock.  (Not at zero since we don't want it to
@@ -1544,7 +1655,31 @@ function runEngineerAloneStrategy() {
 // Unladen Miners' strategies
 
 function runUMAtHomeStrategy() {
-    // Assert:  compass is set.
+    // Assert:  compass is set, as is myQueenPos.
+    // Deal with possible intruders first:
+    if ((foesTotal > 0) &&
+	(adjFoes[ANT_QUEEN] + adjUnladenFoes[1] + adjUnladenFoes[2] +
+	 adjUnladenFoes[3] + adjUnladenFoes[4] > 0)) {
+	var common;
+	debugme("UM at home suspecting a burglar");
+	if (myQueenPos == 0) {
+	    common = [1, 7];
+	} else {
+	    common = [0, 2, 3, 7];
+	}
+	for (var i = 0; i < common.length; i++) {
+	    debugme("UM at home: inspecting compass+" + common[i]);
+	    var c = CCW[compass+common[i]];
+	    if (view[c].ant &&
+		!view[c].ant.friend &&
+		((view[c].ant.type == ANT_QUEEN) ||
+		 (view[c].ant.food == 0))) {
+		debugme("UM at home spotted a burglar");
+		// Stay put.
+		return CELL_NOP;
+	    }
+	}
+    }
     // Don't move until queen's clock counter has turned valid, but may
     // paint ahead.
     // We start out in the middle of the rail with the queen diagonally
@@ -1978,28 +2113,7 @@ function runUMShaftWrappingStrategy() {
 }
 
 function runUMReachingHomeStrategy() {
-    // In a similar vein:  The first shaft drilled off rail3 will wrap
-    // around onto the garden if it finds no food.  The miner will dispute
-    // some colors with the gardener until the gardener is momentarily
-    // preoccupied with clock business, allowing us to step forward,
-    // and then we'll know we're close to home.  (Or we may have got
-    // confused and found the secretary by lucky accident.  Or we have
-    // stepped aside to the first RR0 cell of rail1, where we see the
-    // secretary but not the queen.)  Either way... try going clockwise
-    // until we're on a rail again.
-    for (var i = 0; i < TOTAL_NBRS; i++) {
-	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
-	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (view[CCW[i]].color == LCL_CLEAR) {
-		// Oops, we've met staff who is herself lost.
-		return (runLostMinerStrategy(true));
-	    } else if (destOK[CCW[i+1]]) {
-		return {cell:CCW[i+1]};
-	    }
-	}
-    }
-    // No cigar... for now, wait for a better opportunity.
-    return CELL_NOP;
+    return (runMinerNavigatingTheGardenTactic());
 }
 
 function runUMCongestionResolutionStrategy() {
@@ -2336,19 +2450,7 @@ function runLMReachingHomeStrategy() {
     }
     // If this didn't work, we do what a UM would do in this case:  locate the
     // friendly staff and circle her clockwise.
-    for (var i = 0; i < TOTAL_NBRS; i++) {
-	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
-	    (view[CCW[i]].ant.type == ANT_STAFF)) {
-	    if (view[CCW[i]].color == LCL_CLEAR) {
-		// Oops, we've met staff who is herself lost.
-		return (runLostMinerStrategy(true));
-	    } else if (destOK[CCW[i+1]]) {
-		return {cell:CCW[i+1]};
-	    }
-	}
-    }
-    // No cigar... wait for a better opportunity.
-    return CELL_NOP;
+    return (runMinerNavigatingTheGardenTactic());
 }
 
 function runLMLeaveRL1Strategy() {
@@ -2473,8 +2575,13 @@ function runLostMinerStrategy(totally) {
 	}
     }
     if (totally & (friendsTotal == 0)) {
-	// Selectively erase some paint  (but don't even think of attempting
+	// Selectively mess with the arena  (but don't even think of attempting
 	// to battle a pal over it):
+	if (((myColor == COL_YELLOW) && (specNbrs[COL_YELLOW] == 0)) ||
+	    ((myColor == COL_RED) && (specNbrs[COL_RED] == 0))) {
+	    return {cell:POS_CENTER, color:COL_PURPLE};
+	}
+	// Selectively erase some paint:
 	if (((myColor == COL_GREEN) && (specNbrs[COL_GREEN] == 0)) ||
 	    ((myColor == COL_CYAN) && (specNbrs[COL_CYAN] == 0)) ||
 	    ((myColor == COL_BLUE) && (specNbrs[COL_BLUE] == 0)) ||
@@ -2504,7 +2611,10 @@ function runLostMinerStrategy(totally) {
 	    [COL_GREEN, COL_BLUE, COL_CYAN, COL_PURPLE, COL_YELLOW, COL_RED, COL_BLACK];
 	for (var ci = 0; ci < preferredColors.length; ci++) {
 	    var c = preferredColors[ci];
-	    if ((myColor != c) && (specNbrs[c] > 0)) {
+	    if (myColor == c) {
+		break; // don't go round in circles...
+	    }
+	    if (specNbrs[c] > 0) {
 		for (var i = 1; i < TOTAL_NBRS; i++) {
 		    if ((view[CCW[i]].color == c) && destOK[CCW[i]]) {
 			return {cell:CCW[i]};
@@ -2513,6 +2623,9 @@ function runLostMinerStrategy(totally) {
 	    }
 	}
     }
+    // Have run out of ideas - resort to random walking.
+    // (Caveat maintainer:  Any further color-erasing at this point
+    // would be liable to damage the rails.)
     if (ACT_RANDOMLY_WHEN_CONFUSED) {
 	for (var i = 1; i < TOTAL_NBRS; i += 2) {
 	    // lateral directions preferred
@@ -3052,7 +3165,7 @@ function runUMCenterRailTactic() {
 	return (runUMPreparingShaftStrategy());
     }
     if (compass < 0) { // still no idea where I am, give up
-	return (runLostMinerStrategy(false));
+	return (runLostMinerStrategy(true));
     }
     // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
@@ -3307,9 +3420,22 @@ function runLMLeavingRightWallTactic() {
 
 function runLMWrappingOntoRailTactic(pattern, mismatch) {
     // Assert:  compass is set, PAT_MS0_WRAPPING has matched.
+    // Unlike the UM case, there's no point attempting to propagate the
+    // shaft-has-wrapped condition to the shaft head because a laden
+    // miner would erase the RM1 marking as soon as she reaches mid-rail.
+    // Aim for RL1, or if that is occupied, RL0.
     debugme("LMWrappingOntoRailTactic...");
-    // #future# (hasn't yet occurred often enough to look worth the effort)
-    return CELL_NOP; // placeholder
+    if (mismatch < 0) {
+	// Fix a forward discrepancy (can't really happen).
+	var cc = fwdWrong[0];
+	return {cell:cc.v, color:fixup(pattern[cc.p])};
+    } else if (destOK[CCW[compass+1]]) {
+	return {cell:CCW[compass+1]};
+    } else if (destOK[CCW[compass]]) {
+	return {cell:CCW[compass]};
+    } else {
+	return CELL_NOP;
+    }
 }
 
 function runLMAscendingShaftTactic(pattern, mismatch) {
@@ -3461,7 +3587,7 @@ function runLMCenterRailTactic() {
 	    return (runLMDepartingFromShaftStrategy());
 	}
 	// Still no idea where I am, give up.
-	return (runLostMinerStrategy(false));
+	return (runLostMinerStrategy(true));
     }
     // Assert:  compass is now set.
     debugme("+ compass is set at " + compass + "; mismatch = " + mismatch);
@@ -3542,6 +3668,45 @@ function runLMLeaveRRTactic() {
     } else { // wait for the obstacles to go away
 	return CELL_NOP;
     }
+}
+
+function runMinerNavigatingTheGardenTactic() {
+    // The first shaft drilled off rail3 will wrap around onto the garden
+    // if it finds no food.  The miner will dispute some colors with the
+    // gardener until the gardener is momentarily preoccupied with clock
+    // business, allowing us to step forward, and then we'll know we're
+    // close to home.  (Or we may have got confused and found the secretary
+    // by lucky accident.  Or we have stepped aside to the first RR0 cell of
+    // rail1, where we see the secretary but not the queen.)  Either way...
+    // try going clockwise until we're on a rail again.
+    for (var i = 0; i < TOTAL_NBRS; i++) {
+	if (view[CCW[i]].ant && view[CCW[i]].ant.friend &&
+	    (view[CCW[i]].ant.type == ANT_STAFF)) {
+	    if (view[CCW[i]].color == LCL_CLEAR) {
+		// Oops, we've met staff who is herself lost.
+		// Assuming the queen has resettled, look for the new garden.
+		if (i & 1) {
+		    if ((view[CCW[i+3]].color == LCL_G5) &&
+			destOK[CCW[i+3]]) {
+			return {cell:CCW[i+3]};
+		    }
+		} else {
+		    if ((view[CCW[i+4]].color == LCL_G6) &&
+			destOK[CCW[i+4]]) {
+			return {cell:CCW[i+4]};
+		    } else if ((view[CCW[i+3]].color == LCL_G5) &&
+			       destOK[CCW[i+3]]) {
+			return {cell:CCW[i+3]};
+		    }
+		}
+		return (runLostMinerStrategy(true));
+	    } else if (destOK[CCW[i+1]]) {
+		return {cell:CCW[i+1]};
+	    }
+	}
+    }
+    // No cigar... for now, wait for a better opportunity.
+    return CELL_NOP;
 }
 
 // Engineers' tactics

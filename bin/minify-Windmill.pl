@@ -155,6 +155,7 @@ while (<>) {
     s/runLMCenterRailTactic/rLCRTc/g;
     s/runLMLeaveRLTactic/rLRLTc/g;
     s/runLMLeaveRRTactic/rLRRTc/g;
+    s/runMinerNavigatingTheGardenTactic/rMNGTc/g;
     
     s/specLikeRL1/spcRL1/g;
     s/specLikeRR0/spcRR0/g;
