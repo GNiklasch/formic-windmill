@@ -88,11 +88,13 @@ while (<>) {
     s/runUMStrategies/rUSs/g;
 
     s/runQueenScramblingStrategy/rQScrSy/g;
+    s/runQueenLightspeedStrategy/rQLsSy/g;
     s/runQueenLeavingStrategy/rQLvSy/g;
     s/runQueenSettlingStrategy/rQSgSy/g;
     s/runQueenOperatingMineStrategy/rQOSy/g;
     s/runQueenConfusedStrategy/rQCSy/g;
     s/runSecOperatingStrategy/rSOSy/g;
+    s/runSecLightspeedStrategy/rSLSy/g;
     s/runSecEmergencyStrategy/rSESy/g;
     s/runGardenerOperatingStrategy/rGOSy/g;
     s/runGardenerSettlingStrategy/rGSSy/g;

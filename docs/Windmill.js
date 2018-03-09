@@ -33,6 +33,7 @@ var ACT_RANDOMLY_WHEN_CONFUSED = true;
 // -- Food hoarding thresholds (tunables): --
 // We aim to end  (in a typically crowded arena)  with about 300 food
 // hoarded by the queen, 60-65 junior and 45-60 senior miners.
+var THRESHOLDC = 2; // transition from trail-guided to lightspeed scrambling
 var THRESHOLD0 = 0; // hold on to this once settled
 var THRESHOLD1 = 8; // collect at least this much food before settling
 var THRESHOLD2 = 17; // throttle back the spawning of junior miners
@@ -795,8 +796,13 @@ function runQueenStrategies () {
 	    var cell = view[CCW[i]];
 	    if (cell.ant && cell.ant.type == ANT_STAFF) {
 		compass = i & 6;
+		debugme("Queen: compass is set at " + compass);
 		if (i & 1) { // found (only) the secretary
-		    return (runQueenLeavingStrategy());
+		    if (myFood <= THRESHOLDX) {
+			return (runQueenLightspeedStrategy());
+		    } else {
+			return (runQueenLeavingStrategy());
+		    }
 		} else { // found (only) the gardener
 		    return (runQueenSettlingStrategy());
 		}
@@ -830,6 +836,8 @@ function runSecStrategies () {
 	view[CCW[compass+3]].ant.friend &&
 	(view[CCW[compass+3]].ant.type == ANT_STAFF)) {
 	return (runSecOperatingStrategy());
+    } else if (view[CCW[compass+1]].ant.food <= THRESHOLDX) {
+	return (runSecLightspeedStrategy());
     } else {
 	return (runSecEmergencyStrategy());
     }
@@ -1059,7 +1067,12 @@ function runQueenScramblingStrategy() {
     if (unobstructed) {
 	if (foodTotal > 0) {
 	    return (runQueenScramblingEatingTactic()); // fast path
+	} else if (myFood >= THRESHOLDC) {
+	    // Create the secretary/navigator on a random laterally
+	    // adjacent cell, initiating the lightspeed phase.
+	    return {cell:1, type:ANT_STAFF};
 	} else if (myFood >= THRESHOLD1) {
+	    // obsolescent
 	    return (runQueenPrepareToSettleTactic());
 	} else if (myColor != LCL_TRAIL) {
 	    if ((myColor == LCL_CLEAR) ||
@@ -1438,6 +1451,51 @@ function runQueenOperatingMineStrategy() {
     return CELL_NOP; // notreached
 }
 
+function runQueenLightspeedStrategy() {
+    // Assert:  compass is set, secretary at CCW[compass+1] acting as
+    // our navigator.
+    debugme("Lightspeed queen...");
+    if (myFood >= THRESHOLD1) {
+	if (myColor != LCL_CLEAR) {
+	    return {cell:POS_CENTER, color:LCL_CLEAR};
+	} else {
+	    for (var i = 0; i < TOTAL_NBRS; i+=2) {
+		if (view[CCW[i]].color != LCL_CLEAR) {
+		    return {cell:CCW[i], color:LCL_CLEAR};
+		}
+	    }
+	}
+	// If our surroundings look calm, initiate the settling phase
+	// by turning the secretary into a gardener:
+	if ((foesTotal == 0) && (friendsTotal == 1)) {
+	    debugme("Turning the secretary into the gardener.");
+	    return {cell:CCW[compass+7]};
+	}
+	// otherwise fall through
+    }
+    if ((foesTotal == 0) && (friendsTotal == 1)) {
+	if (view[CCW[compass+3]].food +
+	    view[CCW[compass+4]].food > 0) {
+	    // stay put, forcing a turn towards the food
+	    return CELL_NOP;
+	} else {
+	    // fast path: travel straight
+	    return {cell:CCW[compass+2]};
+	}
+    } else if (destOK[CCW[compass]] && destOK[CCW[compass+7]]) {
+	return {cell:CCW[compass]};
+    } else if (destOK[CCW[compass+6]]) {
+	// emergency back-off cases, losing our navigator
+	return {cell:CCW[compass+6]};
+    } else if (destOK[CCW[compass+5]]) {
+	return {cell:CCW[compass+5]};
+    } else if (destOK[CCW[compass+4]]) {
+	return {cell:CCW[compass+4]};
+    } else {
+	return CELL_NOP; // no good options left
+    }
+}
+
 function runQueenLeavingStrategy() {
     // Assert:  compass is set, secretary at CCW[compass+1].
     debugme("Yukon ho!");
@@ -1474,6 +1532,31 @@ function runSecOperatingStrategy() {
 	return {cell:POS_CENTER, color:incrementSc(myColor)};
     }
     return CELL_NOP; // notreached
+}
+
+function runSecLightspeedStrategy() {
+    // Assert:  compass is set, queen and myself mutually at CCW[compass+1]
+    // (facing in opposite directions);  *no* gardener at CCW[compass+3].
+    debugme("Lightspeed secretary...");
+    if ((foesTotal == 0) && (friendsTotal == 1)) {
+	if (view[CCW[compass+7]].food +
+	    view[CCW[compass+6]].food > 0) {
+	    // force the queen to turn towards it
+	    return CELL_NOP;
+	} else {
+	    return {cell:CCW[compass]};
+	}
+    } else {
+	// The secretary at this point can't see far in the direction we
+	// want to travel.  Some praying is involved...
+	if (destOK[CCW[compass]]) {
+	    return {cell:CCW[compass]};
+	} else if (destOK[CCW[compass+2]]) {
+	    // try turning away from them
+	    return {cell:CCW[compass+2]};
+	}
+    }
+    return CELL_NOP; // fallback
 }
 
 function runSecEmergencyStrategy() {
