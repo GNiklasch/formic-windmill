@@ -33,7 +33,7 @@ var ACT_RANDOMLY_WHEN_CONFUSED = true;
 // -- Food hoarding thresholds (tunables): --
 // We aim to end  (in a typically crowded arena)  with about 300 food
 // hoarded by the queen, 60-65 junior and 45-60 senior miners.
-var THRESHOLDC = 2; // transition from trail-guided to lightspeed scrambling
+var THRESHOLDC = 1; // transition from trail-guided to lightspeed scrambling
 var THRESHOLD0 = 0; // hold on to this once settled
 var THRESHOLD1 = 11; // collect at least this much food before settling
 var THRESHOLD2 = 17; // throttle back the spawning of junior miners
