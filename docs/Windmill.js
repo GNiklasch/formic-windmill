@@ -1071,9 +1071,6 @@ function runQueenScramblingStrategy() {
 	    // Create the secretary/navigator on a random laterally
 	    // adjacent cell, initiating the lightspeed phase.
 	    return {cell:1, type:ANT_STAFF};
-	} else if (myFood >= THRESHOLD1) {
-	    // obsolescent
-	    return (runQueenPrepareToSettleTactic());
 	} else if (myColor != LCL_TRAIL) {
 	    if ((myColor == LCL_CLEAR) ||
 		(specNbrs[LCL_CLEAR] >= TOTAL_NBRS - 1)) {
@@ -2907,20 +2904,6 @@ function runQueenScramblingAroundTactic() {
     // Erase *something*.  We'll step that way on our next move in the
     // hope that things will look better from there.
     return {cell:0, color:LCL_CLEAR};
-}
-
-function runQueenPrepareToSettleTactic() {
-    // Assert unobstructed, compass not set.
-    // Paint our surroundings white before creating the gardener.
-    if (myColor != LCL_QC_RESET) {
-	return {cell:POS_CENTER, color:LCL_QC_RESET};
-    }
-    for (var i = 0; i < TOTAL_NBRS; i++) {
-	if (view[CCW[i]].color != LCL_CLEAR) {
-	    return {cell:CCW[i], color:LCL_CLEAR};
-	}
-    }
-    return {cell:0, type:ANT_STAFF}; // gardener-to-be
 }
 
 function runQueenScramblingEvasionTactic() {
