@@ -134,7 +134,6 @@ while (<>) {
     s/runLMFixingRailStrategy/rLFRSy/g;
 
     s/runQueenScramblingEatingTactic/rQSETc/g;
-    s/runQueenPrepareToSettleTactic/rQPSTc/g;
     s/runQueenScramblingTrailCheckTactic/rQSTCTc/g;
     s/runQueenScramblingAroundTactic/rQSATc/g;
     s/runQueenScramblingSnatchingTactic/rQSSTc/g;
