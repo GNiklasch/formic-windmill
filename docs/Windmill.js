@@ -35,7 +35,7 @@ var ACT_RANDOMLY_WHEN_CONFUSED = true;
 // hoarded by the queen, 60-65 junior and 45-60 senior miners.
 var THRESHOLDC = 1; // transition from trail-guided to lightspeed scrambling
 var THRESHOLD0 = 0; // hold on to this once settled
-var THRESHOLD1 = 11; // collect at least this much food before settling
+var THRESHOLD1 = 15; // collect at least this much food before settling
 var THRESHOLD2 = 17; // throttle back the spawning of junior miners
 var THRESHOLD3 = 67; // start creating senior miners
 var THRESHOLD4 = 120; // stop creating junior miners
