@@ -1479,6 +1479,10 @@ function runQueenLightspeedStrategy() {
 	    // fast path: travel straight
 	    return {cell:CCW[compass+2]};
 	}
+    } else if (destOK[CCW[compass+2]] && destOK[CCW[compass+3]]) {
+	// Nothing in our way and nothing ominous to our left:
+	// travel straight, too.
+	return {cell:CCW[compass+2]};
     } else if (destOK[CCW[compass]] && destOK[CCW[compass+7]]) {
 	return {cell:CCW[compass]};
     } else if (destOK[CCW[compass+6]]) {
