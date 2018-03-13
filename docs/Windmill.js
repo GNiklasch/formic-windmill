@@ -1650,12 +1650,15 @@ function runGardenerOperatingStrategy() {
 	// a ringing clock.  The gardener prefers it quiet, but we give
 	// the secretary time to advance her clock before clearing the
 	// alarm  (otherwise it would immediately ring again!).
+	// Of course it can also happen when an enemy has repainted the
+	// gardener's cell.
 	if ((myColor == LCL_PHASE_RINGING) &&
 	    isScZero(view[CCW[compass+7]].color)) {
 	    return CELL_NOP;
-	} else {
+	} else if (foesTotal == 0) {
 	    return {cell:POS_CENTER, color:LCL_PHASE_RUNNING};
 	}
+	// else fall through
     } else if (isScOne(view[CCW[compass+7]].color) &&
 	       isQcTwo(view[CCW[compass]].color)) {
 	// act as a clock divider
@@ -1665,8 +1668,20 @@ function runGardenerOperatingStrategy() {
 	case LCL_PHASE_RUNNING1:
 	    return {cell:POS_CENTER, color:LCL_PHASE_RUNNING};
 	default:
-	    return CELL_NOP; // notreached
+	    // Our cell is the wrong color, and there's a foe in view
+	    // which didn't trigger the defense code, and we should be
+	    // clock-dividing.  Deal with the latter first as best we can.
+	    return {cell:POS_CENTER, color:LCL_PHASE_RUNNING};
 	}
+    }
+    // We still have to deal with the fall-through case where an enemy
+    // has messed with our own cell color.  In this case, throw dice to
+    // decide whether to mess with the intruder by fixing garden colors
+    // around us or to fix our own cell  first  (which the gardening
+    // tactic does not check).
+    if ((foesTotal > 0) && !LCR_PHASES_RUNNING[myColor] &&
+	(compass & 4)) {
+	return {cell:POS_CENTER, color:LCL_PHASE_RUNNING};
     } else {
 	return (runGardenerGardeningTactic());
     }
@@ -3006,9 +3021,9 @@ function runGardenerGardeningTactic() {
     // (facing in different directions).  Either waiting for the secretary
     // to materialize, or seeing her at my CCW[compass+7].
     // Aside from the garden, also keep an eye on what we can see of rail3.
+    debugme("GardenerGardeningTactic...");
     var pattern = PAT_GARDEN;
     var mismatch = patternCheck(pattern, POS_CENTER, 0, 1);
-    debugme("GardenerGardeningTactic...");
     if (mismatch != 0) {
 	var cc = fwdWrong[0];
 	// (PAT_GARDEN contains no color ranges)
