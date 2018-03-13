@@ -1,7 +1,11 @@
 ## In work:
 
+### Bugfixes:
+0026 Fix a broken attempt at randomizing
+
 ### Enhancements:
 0024 Lightspeed tadpole phase
+0025 Randomize the gardener's color-fixing
 
 ## v1.6 2018-03-09 patch release
 
