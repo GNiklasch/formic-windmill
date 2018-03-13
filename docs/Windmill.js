@@ -1210,7 +1210,7 @@ function runQueenOperatingMineStrategy() {
 		!view[CCW[compass+i]].ant.friend) {
 		debugme("Enemy sighted at " + i + "!");
 		// Randomize the reaction somewhat:
-		var j = (compass & 1) ? 1 : -1;
+		var j = (compass & 4) ? 1 : -1;
 		if (destOK[CCW[compass+i-j]]) {
 		    debugme("--- outflanking at " + (i-j));
 		    return {cell:CCW[compass+i-j], type:ANT_JUNIOR_MINER};
