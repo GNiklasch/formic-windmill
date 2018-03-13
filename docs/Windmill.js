@@ -1068,8 +1068,16 @@ function runQueenScramblingStrategy() {
 	if (foodTotal > 0) {
 	    return (runQueenScramblingEatingTactic()); // fast path
 	} else if (myFood >= THRESHOLDC) {
-	    // Create the secretary/navigator on a random laterally
-	    // adjacent cell, initiating the lightspeed phase.
+	    // Create the secretary/navigator on a laterally adjacent cell,
+	    // initiating the lightspeed phase whilst trying not to run
+	    // back along the trail that got us here.
+	    for (var i = 0; i < TOTAL_NBRS; i+=2) {
+		if ((view[CCW[i]].color == LCL_TRAIL) ||
+		    (view[CCW[i+1]].color == LCL_TRAIL)) {
+		    return {cell:CCW[i+1], type:ANT_STAFF};
+		}
+	    }
+	    // choose a random one if someone else has obliterated the trail
 	    return {cell:1, type:ANT_STAFF};
 	} else if (myColor != LCL_TRAIL) {
 	    if ((myColor == LCL_CLEAR) ||
