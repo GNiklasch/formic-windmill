@@ -1,5 +1,8 @@
 ## In work
 
+### Bugfixes:
+0029 Windmill v1.6 lightspeed phase has a potential deadlock
+
 ### Enhancements:
 0027 Derandomize the transition to lightspeed mode
 

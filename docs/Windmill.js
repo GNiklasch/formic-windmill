@@ -84,6 +84,10 @@ var LCL_CLEAR = COL_WHITE;
 // Trail during initial scrambles:
 var LCL_TRAIL = COL_BLUE;
 
+// Lightspeed communications when the navigator sees something the queen
+// cannot see:
+var LCL_LS_FOOD = COL_PURPLE;
+
 // Alert color - enemy queen near our nest:
 var LCL_ALERT = COL_PURPLE;
 
@@ -1479,9 +1483,16 @@ function runQueenLightspeedStrategy() {
 	// otherwise fall through
     }
     if ((foesTotal == 0) && (friendsTotal == 1)) {
-	if (view[CCW[compass+3]].food +
-	    view[CCW[compass+4]].food > 0) {
-	    // stay put, forcing a turn towards the food
+	if (view[CCW[compass+2]].food > 0) {
+	    // this needs to have precedence, to avoid a deadlock
+	    return {cell:CCW[compass+2]};
+	} else if ((view[CCW[compass+3]].food +
+		    view[CCW[compass+4]].food > 0) &&
+		   (view[CCW[compass+1]].color != LCL_LS_FOOD)) {
+	    // Stay put, forcing a turn towards the food -- exept, to
+	    // avoid another deadlock, when it looks like the secretary
+	    // has seen food we cannot see and therefore painted her cell
+	    // instead of stepping.
 	    return CELL_NOP;
 	} else {
 	    // fast path: travel straight
@@ -1548,10 +1559,14 @@ function runSecLightspeedStrategy() {
     // (facing in opposite directions);  *no* gardener at CCW[compass+3].
     debugme("Lightspeed secretary...");
     if ((foesTotal == 0) && (friendsTotal == 1)) {
-	if (view[CCW[compass+7]].food +
-	    view[CCW[compass+6]].food > 0) {
-	    // force the queen to turn towards it
-	    return CELL_NOP;
+	if (view[CCW[compass]].food > 0) {
+	    // this needs to have precedence, to avoid a deadlock
+	    return {cell:CCW[compass]};
+	} else if (view[CCW[compass+7]].food +
+		   view[CCW[compass+6]].food > 0) {
+	    // Tell the queen to turn towards it, and let her know that
+	    // we haven't moved forward.
+	    return {cell:POS_CENTER, color:LCL_LS_FOOD};
 	} else {
 	    return {cell:CCW[compass]};
 	}

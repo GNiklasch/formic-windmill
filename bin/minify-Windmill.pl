@@ -32,6 +32,7 @@ while (<>) {
     s/LCL_M/LM/g;
     s/LMM_FOOD/LMMF/g;
     s/LMM_HOME/LMMH/g;
+    s/LCL_LS_FOOD/LLSF/g;
     s/LCL_G/LG/g;
     s/LCL_PHASE_/LP/g;
     s/LCL_CLEAR/LCLR/g;
