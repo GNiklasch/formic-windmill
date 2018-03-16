@@ -1,6 +1,7 @@
 ## In work
 
 ### Bugfixes:
+0028 Windmill v1.7 can mis-spawn workers whilst (re-)settling
 0029 Windmill v1.6 lightspeed phase has a potential deadlock
 
 ### Enhancements:

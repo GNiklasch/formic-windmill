@@ -1146,7 +1146,52 @@ function runQueenSettlingStrategy() {
     // When resettling after an emergency, we gain one tempo by creating
     // the rail3 engineer  (on the side where we know an enemy to be near)
     // one turn before the gardener sets her cell to LCL_PHASE_BOOTING.
-    if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET)) {
+    // It is not allowed to spawn a worker onto a cell containing food.
+    // (This had not been a problem before evasion/resettling and then
+    // the lightspeed phase were added;  the queen used to consume all
+    // food in view before spawning the gardener.)  If we find any food
+    // in our vicinity, we must find a different spot -- preferably without
+    // losing sight of our current gardener, who will momentarily be turned
+    // back into secretary/navigator.
+    if (foodTotal > 0) {
+	debugme("Queen: can't settle in this food pile");
+	if (destOK[CCW[compass+1]]) {
+	    // Stay next to our navigator and, when resettling, head away
+	    // from the known melee.  (This is why runQueenLightspeedStrategy()
+	    // steps to compass+3 when attempting to switch to settling, not
+	    // to compass+7. since then stepping to compass+1 here would put
+	    // us back to where we just came from, resulting in an infinite
+	    // loop.)
+	    debugme("Queen: Looking for a better spot...");
+	    return {cell:CCW[compass+1]};
+	} else {
+	    // Sigh, there's an obstacle in our way.  Forsake our navigator
+	    // and try to grab the food instead, and pray that this won't
+	    // get us stuck a few steps later.
+	    // For the same reason as before, we do not want to step to
+	    // compass+7 here under any circumstances.  We don't expect
+	    // that cell to have any food  (we just came from there,
+	    // didn't we?).
+	    for (var i = 2; i < TOTAL_NBRS - 1; i++) {
+		if (destOK[CCW[compass+i]] &&
+		    (view[CCW[compass+i]].food > 0)) {
+		    debugme("Queen: eat first and worry later...");
+		    return {cell:CCW[compass+i]};
+		}
+	    }
+	    // When that didn't work, things have got truly confused.
+	    // Pick a free cell, if any.
+	    for (var i = 2; i < TOTAL_NBRS - 1; i++) {
+		if (destOK[CCW[compass+i]]) {		
+		    debugme("Queen: escaping to compass + " + i);
+		    return {cell:CCW[compass+i]};
+		}
+	    }
+	    // Nothing at all seems to work...
+	    debugme("Queen: can't settle, and nowhere to go!?");
+	    return CELL_NOP;
+	}
+    } else if ((myFood > THRESHOLD0) && (myColor == LCL_QC_RESET)) {
 	if (destOK[CCW[compass+7]]) {
 	    return { cell:CCW[compass+7], type:ANT_ENGINEER};
 	} else if (view[CCW[compass]].color == LCL_PHASE_BOOTING) {
@@ -1475,10 +1520,12 @@ function runQueenLightspeedStrategy() {
 	    }
 	}
 	// If our surroundings look calm, initiate the settling phase
-	// by turning the secretary into a gardener:
+	// by turning the secretary into a gardener.  For subtle reasons
+	// having to do with settling vs. resettling, we use compass+3
+	// here and not compass+7.
 	if ((foesTotal == 0) && (friendsTotal == 1)) {
 	    debugme("Turning the secretary into the gardener.");
-	    return {cell:CCW[compass+7]};
+	    return {cell:CCW[compass+3]};
 	}
 	// otherwise fall through
     }
