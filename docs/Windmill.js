@@ -3649,15 +3649,27 @@ function runLMAscendingShaftTactic(pattern, mismatch) {
 	return {cell:POS_CENTER, color:LCL_CLEAR};
     } else if (view[CCW[compass+5]].color == LCL_MM_HOME) {
 	return {cell:CCW[compass+5], color:LCL_CLEAR};
-    } else if ((mismatch >= 0) && destOK[c]) {
-	debugme("......Climb, baby, climb!");
-	return {cell:c};
+    } else if (mismatch >= 0) {
+	if (destOK[c]) {
+	    debugme("......Climb, baby, climb!");
+	    return {cell:c};
+	} else if ((view[c].food > 0) && (foesTotal == 0)) {
+	    // If we're stopped by food, it means we have *already* missed our
+	    // rail on our way home.  In this case, trying to go around the
+	    // obstacle risks making even more of a mess, but let's pray...
+	    if (destOK[CCW[compass+4]]) {
+		return {cell:CCW[compass+4]};
+	    } else if (destOK[CCW[compass+3]]) {
+		return {cell:CCW[compass+3]};
+	    } else if (destOK[CCW[compass+6]]) {
+		return {cell:CCW[compass+6]};
+	    } else if (destOK[CCW[compass+7]]) {
+		return {cell:CCW[compass+7]};
+	    }
+	}
+	// fall through
     }
     // Let our descending pals deal with any collision resolution.
-    // If we're stopped by food, it means we have *already* missed our
-    // rail on our way home.  In this case, best to stay where we are
-    // rather than creating yet more of a mess by trying to go around
-    // the "obstacle".
     return CELL_NOP;
 }
 
