@@ -2195,7 +2195,7 @@ function runUMDrillingShaftStrategy() {
 		return {cell:CCW[compass]};
 	    } else if (destOK[CCW[compass+1]]) {
 		// Try the apparent RR0 cell instead  (risky - we might not
-		// recognize it as such once we stand on it, even it is!).
+		// recognize it as such once we stand on it, even if it is!).
 		return {cell:CCW[compass+1]};
 	    } else {
 		debugme("Too crowded to try switching to the rail.");
@@ -3505,30 +3505,71 @@ function runUMDrillingShaftTactic(pattern, mismatch) {
 	    // into an adjacent shaft or when we're recreating a shaft whose
 	    // beginnings, including the IN_USE marking, had been wiped out
 	    // by an opponent.  We don't expect them to be frequent.
-	    if (view[c].ant && view[c].ant.friend &&
-		(view[c].ant.food > 0)) {
-		// Painting a homeward marker would be pointless -- our
-		// opposite number would clear it before we could make any
-		// use of it.  So just step aside to let the laden friend
-		// pass.
-		// #future# We lack explicit code for doing a lifelined
-		// step back to the middle of the shaft.  A random walk
-		// usually succeeds anyway, and the situation can only arise
-		// when we were *already* descending a busy shaft by mistake,
-		// so ending up in a parallel shaft nearby is not going to
-		// make things any worse than they already are.
-		if ((view[CCW[compass]].color == LCL_CLEAR) &&
-			   destOK[CCW[compass]]) {
-		    return {cell:CCW[compass]};
-		} else if ((view[CCW[compass+2]].color == LCL_CLEAR) &&
-			   destOK[CCW[compass+2]]) {
-		    return {cell:CCW[compass+2]};
-		} else { // hemmed in by a crowd
-		    // #future# attempt shaft congestion resolution...?
-		    return CELL_NOP;
+	    if (view[c].ant && view[c].ant.friend) {
+		if (view[c].ant.food > 0) {
+		    // Painting a homeward marker would be pointless -- our
+		    // opposite number would clear it before we could make any
+		    // use of it.  So just step aside to let the laden friend
+		    // pass.
+		    // #future# We lack explicit code for doing a lifelined
+		    // step back to the middle of the shaft.  A random walk
+		    // usually succeeds anyway, and the situation can only
+		    // arise when we were *already* descending a busy shaft
+		    // by mistake, so ending up in a parallel shaft nearby
+		    // is not going to make things any worse than they
+		    // already are.
+		    if ((view[CCW[compass]].color == LCL_CLEAR) &&
+			destOK[CCW[compass]]) {
+			return {cell:CCW[compass]};
+		    } else if ((view[CCW[compass+2]].color == LCL_CLEAR) &&
+			       destOK[CCW[compass+2]]) {
+			return {cell:CCW[compass+2]};
+		    } else { // hemmed in by a crowd
+			// #future# attempt shaft congestion resolution...?
+			return CELL_NOP;
+		    }
+		} else {
+		    debugme("UM: There's a queue in this shaft...");
+		    // Check whether there's a third friendly UM behind us
+		    // who has already arrived at the same conclusion.
+		    var c = CCW[compass+5];
+		    if (view[c].ant && view[c].ant.friend &&
+			(view[c].ant.food == 0)) {
+			if (view[c].color == LCL_MM_HOME) {
+			    debugme("UM: Stepping outside.");
+			    // Biased to our left  (hoping to explore further
+			    // out along our rail, eventually).
+			    if (destOK[CCW[compass+2]]) {
+				return {cell:CCW[compass+2]};
+			    } else if (destOK[CCW[compass+3]]) {
+				return {cell:CCW[compass+3]};
+			    } else if (destOK[CCW[compass+4]]) {
+				return {cell:CCW[compass+4]};
+			    } else if (destOK[CCW[compass]]) {
+				// One last attempt towards our right...
+				return {cell:CCW[compass]};
+			    } else {
+				debugme("UM: ...can't.");
+				return CELL_NOP;
+			    }
+			} else if (myColor != LCL_MM_HOME) {
+			    // Make a note of the fact.  (This won't disturb
+			    // the UM at the head of the queue.)  If the marker
+			    // is still there on our next step, it will mess up
+			    // the spectrum for ourselves.  Someone behind us
+			    // may clear it in the meantime, though.
+			    return {cell:POS_CENTER, color:LCL_MM_HOME};
+			} else {
+			    // Wait patiently.
+			    return CELL_NOP;
+			}
+		    } else {
+			// Wait patiently.
+			return CELL_NOP;
+		    }
 		}
 	    } else {
-		// Wait behind an unladen buddy, or obstruct a foe.
+		// Obstruct a foe.
 		return CELL_NOP;
 	    }
 	}
