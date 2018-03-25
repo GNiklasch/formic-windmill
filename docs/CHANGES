@@ -1,3 +1,8 @@
+## In work
+
+### Bugfixes:
+0032 Always check for a successful pattern match before trying to fix colors.
+
 ## v1.8 2018-03-16 patch release
 
 ### Bugfixes:
