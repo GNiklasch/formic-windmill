@@ -1,5 +1,8 @@
 ## In work
 
+### Bugfixes:
+0032 Always check for a successful pattern match before trying to fix colors.
+
 ### Enhancements:
 0030 UM congestion in shafts
 0031 LM congestion in shafts

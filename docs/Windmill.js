@@ -3937,7 +3937,11 @@ function runEngineerLeavingGardenTactic() {
 	}
     }
     mismatch = patternCheck(pattern, AIM_UP, 0, 1);
-    if ((mismatch == 0) && destOK[CCW[compass+5]] &&
+    if (compass < 0) {
+	// Surroundings are unrecognizable...
+	debugme("Engineer: Next to staff and miner, but no idea where I am.");
+	return CELL_NOP;
+    } else if ((mismatch == 0) && destOK[CCW[compass+5]] &&
 	((view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend) ||
 	 (view[CCW[compass+4]].ant && view[CCW[compass+4]].ant.friend))) {
 	// Only step forward when a friend will remain in view.
@@ -4096,7 +4100,8 @@ function runEngineerCleaningLeftRailEdgeTactic() {
 		pattern = PAT_FRL0;
 		debugme("- trying PAT_FRL0");
 		mismatch = patternCheck(pattern, AIM_RIGHT, 1, 0.3);
-		if (mismatch < 0) { // didn't recognize this as RL0, try RL2
+		if (mismatch == PAT_NOMATCH) {
+		    // didn't recognize this as RL0, try RL2
 		    pattern = PAT_FRL2;
 		    debugme("- trying PAT_FRL2");
 		    mismatch = patternCheck(pattern, AIM_RIGHT, 1, 0.3);
