@@ -2,6 +2,7 @@
 
 ### Bugfixes:
 0032 Always check for a successful pattern match before trying to fix colors.
+0034 Congestion resolution must not be allowed to kick in during re-settling
 
 ### Enhancements:
 0030 UM congestion in shafts

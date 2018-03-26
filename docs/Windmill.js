@@ -952,7 +952,13 @@ function runDefenderStrategies() {
 }
 
 function runUMStrategies () {
-    if ((friendsTotal + foesTotal >= 4) &&
+    // Congestion resolution takes precedence, except when we're at home
+    // and the clock isn't yet running  (in which case the compass is
+    // already set).
+    if ((adjFriends[ANT_QUEEN] > 0) &&
+	!LCR_QC_VALID[view[CCW[compass+myQueenPos]].color]) {
+	return (runUMAtHomeStrategy());
+    } else if ((friendsTotal + foesTotal >= 4) &&
 	(adjFriends[ANT_JUNIOR_MINER] + adjFriends[ANT_SENIOR_MINER] +
 	 adjFriends[ANT_ENGINEER] >= 3)) {
 	return (runUMCongestionResolutionStrategy());
