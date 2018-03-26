@@ -1384,14 +1384,15 @@ function runQueenOperatingMineStrategy() {
 	// workers, or one diagonally and diametrically between the enemy
 	// queen and ourselves.  The latter case will be detected and flagged
 	// by defenders on either side of the bandit.
-	if (((bandits >= 2) && (myFood > THRESHOLDX)) ||
-	    ((bandits >= 1) && view[CCW[compass+5]].ant &&
-	     view[CCW[compass+5]].ant.friend &&
-	     (view[CCW[compass+5]].color == LCL_ALERT) &&
-	     (view[CCW[compass+7]].ant && view[CCW[compass+7]].ant.friend &&
-	      (view[CCW[compass+7]].color == LCL_ALERT)) ||
-	     (view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend &&
-	      (view[CCW[compass+3]].color == LCL_ALERT)))) {
+	if ((myFood > THRESHOLDX) &&
+	    ((bandits >= 2) ||
+	     ((bandits >= 1) && view[CCW[compass+5]].ant &&
+	      view[CCW[compass+5]].ant.friend &&
+	      (view[CCW[compass+5]].color == LCL_ALERT) &&
+	      (view[CCW[compass+7]].ant && view[CCW[compass+7]].ant.friend &&
+	       (view[CCW[compass+7]].color == LCL_ALERT)) ||
+	      (view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend &&
+	       (view[CCW[compass+3]].color == LCL_ALERT))))) {
 	    debugme("Thieves in our hall.");
 	    // Step to RM0 of rail1 if possible, keeping the secretary
 	    // in our lateral view and vice versa.  With any luck, this
