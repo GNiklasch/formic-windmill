@@ -1374,7 +1374,18 @@ function runQueenOperatingMineStrategy() {
 	// Otherwise, fall through and get on with business as best we can.
     } else if (foesTotal > 0) {
 	var bandits = adjUnladenFoes[1] + adjUnladenFoes[2] + adjUnladenFoes[3] + adjUnladenFoes[4];
-	if ((bandits >= 2) && (myFood > THRESHOLDX)) {
+	// Watch out for two high-risk scenarios:  *Two* unladen enemy
+	// workers, or one diagonally and diametrically between the enemy
+	// queen and ourselves.  The latter case will be detected and flagged
+	// by defenders on either side of the bandit.
+	if (((bandits >= 2) && (myFood > THRESHOLDX)) ||
+	    ((bandits >= 1) && view[CCW[compass+5]].ant &&
+	     view[CCW[compass+5]].ant.friend &&
+	     (view[CCW[compass+5]].color == LCL_ALERT) &&
+	     (view[CCW[compass+7]].ant && view[CCW[compass+7]].ant.friend &&
+	      (view[CCW[compass+7]].color == LCL_ALERT)) ||
+	     (view[CCW[compass+3]].ant && view[CCW[compass+3]].ant.friend &&
+	      (view[CCW[compass+3]].color == LCL_ALERT)))) {
 	    debugme("Thieves in our hall.");
 	    // Step to RM0 of rail1 if possible, keeping the secretary
 	    // in our lateral view and vice versa.  With any luck, this
@@ -1844,8 +1855,13 @@ function runUMAtHomeStrategy() {
 		((view[c].ant.type == ANT_QUEEN) ||
 		 (view[c].ant.food == 0))) {
 		debugme("UM at home spotted a burglar");
-		// Stay put.
-		return CELL_NOP;
+		// Let our queen know it if we can't see the enemy queen.
+		if ((adjFoes[ANT_QUEEN] == 0) && (myColor != LCL_ALERT)) {
+		    return {cell:POS_CENTER, color:LCL_ALERT};
+		} else {
+		    // Stay put.
+		    return CELL_NOP;
+		}
 	    }
 	}
     }
