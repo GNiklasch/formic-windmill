@@ -1635,6 +1635,11 @@ function runSecLightspeedStrategy() {
 	} else {
 	    return {cell:CCW[compass]};
 	}
+    } else if ((foesTotal > 0) &&
+	       view[CCW[compass+2]].ant &&
+	       !view[CCW[compass+2]].ant.friend) {
+	// An enemy is trailing our queen.  Again, force a right turn.
+	return {cell:POS_CENTER, color:LCL_LS_FOOD};
     } else {
 	// The secretary at this point can't see far in the direction we
 	// want to travel.  Some praying is involved...
