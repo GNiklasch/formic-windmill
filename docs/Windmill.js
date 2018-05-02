@@ -49,8 +49,11 @@ var THRESHOLDX = 15;
 // We lock in queen's hoarded food  (don't expend it on new workers,
 // except in dire emergencies)  when the current amount modulo
 // RATCHET_MODULUS equals RATCHET_RESIDUE:
-var RATCHET_MODULUS = 7;
-var RATCHET_RESIDUE = 4;
+var RATCHET_MODULUS1 = 7;
+var RATCHET_RESIDUE1 = 4;
+// A secondary ratchet controls some of our defensive options:
+var RATCHET_MODULUS2 = 19;
+var RATCHET_RESIDUE2 = THRESHOLDX;
 
 // -- Physical colors: --
 // These could be permuted without breaking anything else below
@@ -1405,6 +1408,17 @@ function runQueenOperatingMineStrategy() {
 	    // Otherwise, fall through.
 	}
 	if ((bandits >= 1) && (myFood > 0)) {
+	    if (((myFood > THRESHOLDX) &&
+		 (myFood % RATCHET_MODULUS2 == RATCHET_RESIDUE2 + compass/2)) ||
+		(myFood < RATCHET_RESIDUE1)) {
+		// Up sticks straight away, if possible.
+		debugme("Ugh, what is this smell?");
+		if (destOK[CCW[compass+2]]) {
+		    debugme("Going unhinged...");
+		    return {cell:CCW[compass+2]};
+		}
+		// Otherwise, try the more conservative approach.
+	    }
 	    // Locate the bandit  (or at least one of them).  If there isn't
 	    // already a laden miner next to it, and if a suitable free cell
 	    // is available, spawn a defender.  The choice of cell must be
@@ -1457,7 +1471,7 @@ function runQueenOperatingMineStrategy() {
 	// all our food on new miners when no new food at all is coming in.
 	if ((myFood <= THRESHOLD0) ||
 	    // No food to spare, can't spawn.
-	    (myFood % RATCHET_MODULUS == RATCHET_RESIDUE)
+	    (myFood % RATCHET_MODULUS1 == RATCHET_RESIDUE1)
 	    // Lock in what we have  (except for theft).
 	   ) {
 	    return (runQueenHousekeepingTactic());
@@ -1563,7 +1577,10 @@ function runQueenLightspeedStrategy() {
 	    // fast path: travel straight
 	    return {cell:CCW[compass+2]};
 	}
-    } else if (destOK[CCW[compass+2]] && destOK[CCW[compass+3]]) {
+    } else if (destOK[CCW[compass+2]] &&
+	       (destOK[CCW[compass+3]] ||
+		(view[CCW[compass+3]].ant &&
+		 view[CCW[compass+3]].ant.friend))) {
 	// Nothing in our way and nothing ominous to our left:
 	// travel straight, too.
 	return {cell:CCW[compass+2]};
