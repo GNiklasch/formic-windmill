@@ -1407,10 +1407,15 @@ function runQueenOperatingMineStrategy() {
 	    }
 	    // Otherwise, fall through.
 	}
-	if ((bandits >= 1) && (myFood > 0)) {
-	    if (((myFood > THRESHOLDX) &&
-		 (myFood % RATCHET_MODULUS2 == RATCHET_RESIDUE2 + compass/2)) ||
-		(myFood < RATCHET_RESIDUE1)) {
+	if (myFood < RATCHET_RESIDUE1) {
+	    debugme("Where has my food gone!?");
+	    if (destOK[CCW[compass+2]]) {
+		debugme("Going unhinged...");
+		return {cell:CCW[compass+2]};
+	    }
+	} else if ((bandits >= 1) && (myFood > 0)) {
+	    if ((myFood > THRESHOLDX) &&
+		(myFood % RATCHET_MODULUS2 == RATCHET_RESIDUE2 + compass/2)) {
 		// Up sticks straight away, if possible.
 		debugme("Ugh, what is this smell?");
 		if (destOK[CCW[compass+2]]) {
