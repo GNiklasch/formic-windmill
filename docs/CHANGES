@@ -7,6 +7,10 @@
 0037 Review further defense options
 0039 Abandon the hub when hoarded food drops too low
 
+### Experimental enhancements  (rejected for production use after testing):
+0038 Review the spawning thresholds tuning
+0040 Food-Controlled Oscillator feature
+
 ## v1.9 2018-03-27 patch release
 
 ### Bugfixes:

@@ -11,6 +11,7 @@ while (<>) {
     s/^.*(DEBUGME|debugme).*;$//g; # needs manual work
     s/DEBUG_PATTERN_CHECK_VERBOSELY/DPCV/g;
     s/ACT_RANDOMLY_WHEN_CONFUSED/RW/g;
+    s/ENABLE_FCO/EFCO/g;
     s/THRESHOLD/TH/g;
     s/RATCHET_MODULUS/RM/g;
     s/RATCHET_RESIDUE/RD/g;

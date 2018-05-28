@@ -29,10 +29,24 @@ var DEBUG_PATTERN_CHECK_VERBOSELY = false;
 // improvements)  was easier when they stay put, so random walks are subject
 // to this global switch:
 var ACT_RANDOMLY_WHEN_CONFUSED = true;
+// Whether to use the experimental Food-Controlled Oscillator feature
+// instead of our classic fixed-rate oscillator.  Experimentation shows
+// that its effects are similar to the threshold tuning described below
+// (and are somewhat more consistent) -- it is ultimately detrimental.
+// It gains more food in games without any strong competitors, it occasionally
+// gains one rung on the scoreboard, but too often it loses ten rungs or more.
+var ENABLE_FCO = false;
 
 // -- Food hoarding thresholds (tunables): --
 // We aim to end  (in a typically crowded arena)  with about 300 food
 // hoarded by the queen, 60-65 junior and 45-60 senior miners.
+// Increasing THRESHOLD2 and THRESHOLD4 and THRESHOLD5 whilst lowering
+// THRESHOLD3 will result in Windmill spawning somewhat more miners somewhat
+// earlier and ending up with more food on average... in those games which
+// this player had been winning anyway  (where it makes no difference to the
+// leaderboard).  Such tuning however also tends to increase Windmill's own
+// fatal-accident rate more than that of its main competitors, and thus is
+// ultimately detrimental.
 var THRESHOLDC = 1; // transition from trail-guided to lightspeed scrambling
 var THRESHOLD0 = 0; // hold on to this once settled
 var THRESHOLD1 = 15; // collect at least this much food before settling
@@ -45,6 +59,10 @@ var THRESHOLD5 = 390; // stop spawning altogether
 // a new hub, and when losing all the food we have would lose a lot of
 // score points.  (We won't do it when we've had a bad start anyway.)
 var THRESHOLDX = 15;
+// Food-Controlled Oscillator thresholds:
+var THRESHOLDFCO1 = 9;
+var THRESHOLDFCO2 = 26;
+var THRESHOLDFCO3 = 75;
 
 // We lock in queen's hoarded food  (don't expend it on new workers,
 // except in dire emergencies)  when the current amount modulo
@@ -157,7 +175,7 @@ var FALSE_X9 = [false, false, false, false, false, false, false, false, false];
 var UNDEF_X9 = [undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined];
 
 // Queen's clock counter:
-var QC_PERIOD = 6;
+var QC_PERIOD = 6; // subject to change when FCO is enabled
 var LCL_QC_RESET = LCL_CLEAR;
 var LCR_QC = [COL_YELLOW, COL_PURPLE, COL_CYAN, COL_RED, COL_GREEN, COL_BLACK];
 var LCR_QC_VALID = Array.from(FALSE_X9);
@@ -623,6 +641,18 @@ var myself = here.ant;
 var myType = myself.type;
 var myFood = myself.food;
 var amNotHungry = (myType == ANT_ENGINEER || (myType != ANT_QUEEN && myFood > 0));
+
+// FCO self-tuning:
+if (ENABLE_FCO && (myType == ANT_QUEEN)) {
+    if (myFood <= THRESHOLDFCO1) {
+	QC_PERIOD = 5;
+    } else if (myFood <= THRESHOLDFCO2) {
+	QC_PERIOD = 4;
+    } else if (myFood <= THRESHOLDFCO3) {
+	QC_PERIOD = 5;
+    }
+    // else stay at 6
+}
 
 // ---- Where am I?  Take stock of our surroundings ----
 
@@ -1228,15 +1258,20 @@ function runQueenSettlingStrategy() {
  * About the clock oscillator in runQueenOperatingMineStrategy() and
  * runSecOperatingStrategy():
  *
- * The queen cycles her own cell through six colors, the secretary cycles
- * hers through seven, resulting in a 42-moves "beat" cycle.  The gardener
- * monitors both cells and divides the clock rate by two.  The secretary
- * monitors all three cells, too, and after 84 cycles, uses one extra move
- * to "ring the alarm"  (by painting the gardener's cell to say so).
+ * The queen cycles her own cell through four or five or six colors
+ * when the experimental Food-Controlled Oscillator feature is enabled,
+ * depending on her current amount of hoarded food, or always through
+ * six colors otherwise.  The secretary cycles hers through seven,
+ * resulting in a 28-/35-/42-moves "beat" cycle.
+ * The gardener monitors both cells and divides the clock rate by two.
+ * The secretary monitors all three cells, too, and after 56/70/84 cycles,
+ * uses one extra move to "ring the alarm"  (by painting the gardener's
+ * cell to say so).
  * This gives the queen one extra turn to do whatever needs doing now,
  * before both queen and secretary resume the clock-ticking.  Clearing
  * the alarm is left to the gardener.  Overall we get one clock ring
- * every 85 moves  (or just under 12 per 1000 moves).
+ * every 57/71/85 moves  (or just under 12 per 1000 moves at the slowest
+ * of the three rates).
  *
  * For miner-spawning purposes, the random controller orientation is then
  * thrown in to reduce this further to 9 or 6 or 3 (or no) new miners on
@@ -4358,8 +4393,14 @@ function isQcTwo(color) {
 }
 
 function incrementQc(color) {
+    // Slightly more involved than the secretary's version due to
+    // the variable clock rate.
     if (LCR_QC_VALID[color]) {
-	return (LCR_QC[(LCR_QC_VALUE[color] + 1) % QC_PERIOD]);
+	if (LCR_QC_VALUE[color] >= QC_PERIOD) {
+	    return LCR_QC[0];
+	} else {
+	    return (LCR_QC[(LCR_QC_VALUE[color] + 1) % QC_PERIOD]);
+	}
     } else {
 	return undefined;
     }
