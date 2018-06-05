@@ -1,5 +1,5 @@
 /*
- * GNi 2017-09-27 - 2018-03-27
+ * GNi 2017-09-27 - 2018-06-05
 
 For background and context, see:
 https://codegolf.stackexchange.com/questions/135102/formic-functions-ant-queen-of-the-hill-contest
