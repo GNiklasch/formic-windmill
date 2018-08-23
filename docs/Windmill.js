@@ -1905,6 +1905,31 @@ function runEngineerAloneStrategy() {
 
 function runUMAtHomeStrategy() {
     // Assert:  compass is set, as is myQueenPos.
+    // First make sure not to obstruct our queen's escape route when she's
+    // about to go unhinged.
+    if ((myQueenPos == 0) &&
+	(view[CCW[compass]].ant.food < RATCHET_RESIDUE1) &&
+	view[CCW[compass+1]].ant &&
+	view[CCW[compass+1]].ant.friend &&
+	(view[CCW[compass+1]].ant.type == ANT_STAFF)) {
+	debugme("UM at home: I had better step aside...");
+	// Note that no enemy can move between now and our queen's
+	// opportunity to move.  In particular, no enemy can step onto
+	// the cell we're about to vacate.
+	// We had better try not to become an obstacle on the next step,
+	// but our own escape route options may be limited.
+	var cc = [5, 6, 7, 4, 2];
+	for (var i = 0; i < cc.length; i++) {
+	    debugme("UM at home: trying compass+" + cc[i]);
+	    var c = CCW[compass+cc[i]];
+	    if (destOK[c]) {
+		debugme("UM at home: Looking clear, leaving home.");
+		return {cell:c};
+	    }
+	}
+	debugme("UM at home: hemmed in ourselves, unfortunately.");
+	return CELL_NOP;
+    }
     // Deal with possible intruders:
     if ((foesTotal > 0) &&
 	(adjFoes[ANT_QUEEN] + adjUnladenFoes[1] + adjUnladenFoes[2] +
