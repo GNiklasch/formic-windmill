@@ -1905,7 +1905,7 @@ function runEngineerAloneStrategy() {
 
 function runUMAtHomeStrategy() {
     // Assert:  compass is set, as is myQueenPos.
-    // Deal with possible intruders first:
+    // Deal with possible intruders:
     if ((foesTotal > 0) &&
 	(adjFoes[ANT_QUEEN] + adjUnladenFoes[1] + adjUnladenFoes[2] +
 	 adjUnladenFoes[3] + adjUnladenFoes[4] > 0)) {
@@ -1962,8 +1962,15 @@ function runUMAtHomeStrategy() {
 	// #future# Deal with possible food on RR0 at this point
 	// (but only when the clock has started!)
 	// Pattern complete - step ahead when the clock is running and
-	// the road ahead is clear
-	if (LCR_QC_VALID[view[CCW[compass]].color]) {
+	// the road ahead is clear.
+	// The presence of an LM friend on the rail ahead of us is proof
+	// that the clock must already have been running earlier  (i.e.,
+	// it must have got broken by recent enemy interference).
+	if (LCR_QC_VALID[view[CCW[compass]].color] ||
+	    (view[CCW[compass+5]].ant && view[CCW[compass+5]].ant.friend &&
+	     (view[CCW[compass+5]].ant.food > 0)) ||
+	    (view[CCW[compass+6]].ant && view[CCW[compass+6]].ant.friend &&
+	     (view[CCW[compass+6]].ant.food > 0))) {
 	    if (destOK[CCW[compass+5]]) { // off we go to RM1...
 		return {cell:CCW[compass+5]};
 	    } else if (destOK[CCW[compass+4]]) {
