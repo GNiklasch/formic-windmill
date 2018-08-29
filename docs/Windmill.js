@@ -4083,7 +4083,7 @@ function runEngineerLeavingGardenTactic() {
  * Normally to our right on the middle rail;  but she could have stepped
  * straight in front of us to collect food, or she could come in via a
  * wrapped shaft  (or a confused brownian walk)  from our left.
- * So unfortunately she will be no help in setting our compass.
+ * So unfortunately she will be of little help in setting our compass.
  * Instead we'll have to rely on her doing most of the rail painting.
  *
  * Since there isn't a whole lot of redundancy on the left rail edge,
@@ -4094,7 +4094,7 @@ function runEngineerLeavingGardenTactic() {
  * compass backwards on RL1, or mistake a forward RL0 view for a backward
  * RL2 pattern or vice versa.)
  *
- * Specifically for the PAT_RL1 check:
+ * Specifically for the PAT_FRL1 check:
  * It would be nice if we could use a qualityGoal of zero here,
  * but that would leave the engineer stuck if anything off the
  * left rail edge  (where nobody else can correct it)  isn't to
@@ -4108,6 +4108,16 @@ function runEngineerLeavingGardenTactic() {
  * RL2 cell ahead, thus just before the miner stepped out of her
  * view towards the shaft head, and on her own she wouldn't have
  * advanced to the RL2 cell).
+ *
+ * Specifically for the PAT_FRL0 and PAT_FRL2 checks:
+ * If we always tried PAT_FRL0 first but are in fact standing on an RL2
+ * cell, and there's a blue RM1-lookalike cell off the left rail edge
+ * (possibly a legitimate RM1 cell when rails 1 and 3 have met),  we
+ * we could get a spurious match and then find ourselves stuck with our
+ * friendly miner on the "wrong" side of us.  To avoid this, we check
+ * whether there's a diagonally adjacent friendly miner on an RM0 colored
+ * (red) cell to suggest that we're really on RL2 rather than RL0, and in
+ * this case try PAT_FRL2 first.
  */
 function runEngineerBuildingRailTactic() {
     // Assert:  We've left the queen and the gardener behind us, and a
@@ -4126,16 +4136,32 @@ function runEngineerBuildingRailTactic() {
     var mismatch;
     debugme("EngineerBuildingRailTactic...");
     if (myColor == LCL_RL0) {
-	pattern = PAT_FRL0;
-	debugme("- trying PAT_FRL0");
-	mismatch = patternCheck(pattern, AIM_UP, 1, 1);
+	for (var i = 0; i < TOTAL_NBRS; i+=2) {
+	    var c = CCW[i];
+	    if ((view[c].color == LCL_RM0) &&
+		view[c].ant && view[c].ant.friend &&
+		((view[CCW[i]].ant.type == ANT_JUNIOR_MINER) ||
+		 (view[CCW[i]].ant.type == ANT_SENIOR_MINER))) {
+		pattern = PAT_FRL2;
+		debugme("- trying PAT_FRL2 in view of buddy on RM0");
+		mismatch = patternCheck(pattern, AIM_UP, 1, 1);
+		if (compass >= 0) {
+		    break;
+		}
+	    }
+	}
+	if (compass < 0) { // that didn't work out, try RL0
+	    pattern = PAT_FRL0;
+	    debugme("- trying PAT_FRL0");
+	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
+	}
 	if (compass < 0) { // didn't recognize this as RL0, try RL2
 	    pattern = PAT_FRL2;
 	    debugme("- trying PAT_FRL2");
 	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
 	}
 	if ((compass < 0) && (foesTotal > 0)) {
-	    // one more try, on the chance a foe overpainted my own cell
+	    // one last try, on the chance a foe overpainted my own cell
 	    pattern = PAT_FRL1;
 	    debugme("- trying PAT_FRL1");
 	    mismatch = patternCheck(pattern, AIM_UP, 1, 1);
